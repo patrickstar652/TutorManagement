@@ -2,6 +2,10 @@
 const express = require('express');
 const router = express.Router();
 
+const jwt = require('jsonwebtoken')
+require('dotenv').config();
+const SECRET_KEY = process.env.SECRET_KEY;
+
 // 對應 GET /success
 router.get('/success', (req, res) => {
   res.json({
@@ -16,7 +20,8 @@ router.get('/success', (req, res) => {
 const mockUser = {
   account: 'test123',          
   password: '123456'           
-};
+}
+
 router.post('/login', (req, res) => {
   // 從請求的 req body 中取得使用者傳來的帳號和密碼 (前端)
   const { account, password } = req.body; // 請求或回應的主體內容 express 的屬性
@@ -28,7 +33,18 @@ router.post('/login', (req, res) => {
 
   // 如果帳號密碼正確，回傳登入成功
   if (account === mockUser.account && password === mockUser.password) {
-    res.json({ success: true, message: '登入成功' });
+
+    const token = jwt.sign(
+      { account },         // token 裡的內容（payload）
+      SECRET_KEY,          // 加密用密鑰
+      { expiresIn: '1h' }  // 有效時間
+    );
+    res.json({
+      success: true,
+      message: '登入成功',
+      token                 // 把 token 回傳給前端
+    });
+
   } else {
     // 否則回傳 401 Unauthorized，表示登入失敗
     res.status(401).json({ success: false, message: '帳號或密碼錯誤' });
