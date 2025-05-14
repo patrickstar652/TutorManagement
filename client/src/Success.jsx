@@ -23,3 +23,13 @@ function Success() {
   );
 }
 export default Success;
+
+// get 從後端取得資料
+// post 往後端傳資料
+
+// ✅ 總結你剛問的問題：
+// ❓ 兩段都是回傳 JSON，為什麼一個用 GET 一個用 POST？
+// ✔️ 因為：
+// GET 是前端「索取資料」（回傳是預期的行為）
+// POST 是前端「提交資料」（回傳是處理結果）
+

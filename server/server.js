@@ -21,35 +21,10 @@ app.use(cors({
 // middleware 的主要用途就是處理在 request 到達你的路由之前，或者在 response 返回給用戶之前所需要做的各種操作
 app.use(express.json());
 
-const mockUser = {
-  account: 'test123',          
-  password: '123456'           
-};
-
-// 定義「登入」API 註冊路由
-// req 使用者傳來的請求，包括 body、headers、method 等資訊
-// res 伺服器回應用的工具，可用來回傳 JSON、狀態碼等
-app.post('/login', (req, res) => {
-  // 從請求的 req body 中取得使用者傳來的帳號和密碼 (前端)
-  const { account, password } = req.body; // 請求或回應的主體內容 express 的屬性
-
-  // 如果缺少帳號或密碼，回傳 400 Bad Request
-  if (!account || !password) {
-    return res.status(400).json({ success: false, message: '請提供帳號和密碼' });
-  }
-
-  // 如果帳號密碼正確，回傳登入成功
-  if (account === mockUser.account && password === mockUser.password) {
-    res.json({ success: true, message: '登入成功' });
-  } else {
-    // 否則回傳 401 Unauthorized，表示登入失敗
-    res.status(401).json({ success: false, message: '帳號或密碼錯誤' });
-  }
-});
 
 // 同種類型的處理放一個檔案
 // const postRoutes = require('./routes/post');
-const successRoutes = require('./routes/success');
+const successRoutes = require('./routes/user');
 app.use('/', successRoutes); // 所有 /welcome 路由就掛上來了
 
 
@@ -57,7 +32,6 @@ app.use('/', successRoutes); // 所有 /welcome 路由就掛上來了
 app.listen(PORT, () => {
   console.log(`✅ Server running at http://localhost:${PORT}`);
 });
-
 
 
 
