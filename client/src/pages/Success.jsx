@@ -23,15 +23,15 @@ function Success() {
   return (
     <>
       <div>
-        <h2>🎉 登入成功！</h2>
+        <h2 className="mb-4">🎉 登入成功！</h2>
         {welcomeData && (
           <>
-            <p>{welcomeData.message}</p>
-            <p>伺服器時間：{welcomeData.time}</p>
+            <p className="mb-4">{welcomeData.message}</p>
+            <p className="mb-4">伺服器時間：{welcomeData.time}</p>
           </>
         )}
       </div>
-      <form onSubmit={handleLogout}>
+      <form onSubmit={handleLogout} className="mb-4">
         <button type="submit">登出</button>
       </form>
     </>

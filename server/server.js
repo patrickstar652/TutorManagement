@@ -2,7 +2,6 @@
 const express = require('express');
 // 引入 CORS 中介軟體，處理跨域請求
 const cors = require('cors');
-
 // 建立一個 Express 應用
 const app = express();
 // 設定伺服器的監聽埠號

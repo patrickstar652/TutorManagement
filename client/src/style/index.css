@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .input {
+    @apply flex-1 px-3 py-1.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 mb-4;
+  }
+
+  .btn {
+    @apply w-full py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md mb-4
+  }
+}

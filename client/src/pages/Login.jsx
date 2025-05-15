@@ -50,41 +50,52 @@ function Login() {
   };
 
   return (
-    <div style={{ maxWidth: "400px", margin: "50px auto" }}>
-      {/* 標題 */}
-      <h2>登入</h2>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4 mb-4">
+      <div className="w-full max-w-sm bg-white p-6 rounded-xl shadow-md mb-4">
+        {/* 標題 */}
+        <h2 className="text-2xl font-bold text-center text-blue-600 mb-6">
+          登入
+        </h2>
 
-      {/* 登入表單 */}
-      <form onSubmit={handleLogin}>
-        {/* 帳號欄位 */}
-        <div>
-          <label>帳號：</label>
-          <input
-            type="text"
-            value={account} // 讓輸入框的內容「由 React 狀態控制」
-            onChange={(e) => setAccount(e.target.value)} // 當輸入變動時更新 account 狀態
-            required
-          />
-        </div>
+        {/* 登入表單 */}
+        <form onSubmit={handleLogin}>
+          {/* 帳號欄位 */}
+          <div>
+            <label>帳號：</label>
+            <input
+              type="text"
+              value={account} // 讓輸入框的內容「由 React 狀態控制」
+              onChange={(e) => setAccount(e.target.value)} // 當輸入變動時更新 account 狀態
+              required
+              className="input"
+            />
+          </div>
 
-        {/* 密碼欄位 */}
-        <div>
-          <label>密碼：</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)} // 當輸入變動時更新 password 狀態
-            required
-          />
-        </div>
+          {/* 密碼欄位 */}
+          <div>
+            <label>密碼：</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)} // 當輸入變動時更新 password 狀態
+              required
+              className="input"
+            />
+          </div>
 
-        {/* 登入按鈕 */}
-        <button type="submit">登入</button>
-      </form>
+          {/* 登入按鈕 */}
+          <button
+            type="submit"
+            className="btn"
+          >
+            登入
+          </button>
+        </form>
 
-      {/* 顯示伺服器回傳的訊息（成功或錯誤） */}
-      {/* message && <p>{message}</p>// short-circuit operator 短路運算子 */}
-      {message ? <p>{message}</p> : null}
+        {/* 顯示伺服器回傳的訊息（成功或錯誤） */}
+        {/* message && <p>{message}</p>// short-circuit operator 短路運算子 */}
+        {message ? <p>{message}</p> : null}
+      </div>
     </div>
   );
 }

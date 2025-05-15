@@ -1,6 +1,6 @@
-import './App.css'
-import Login from './Login'
-import Success from './Success'
+import './style/App.css'
+import Login from './pages/Login'
+import Success from './pages/Success'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 function App() {
   const router = createBrowserRouter([
