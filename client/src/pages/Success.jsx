@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Logout from "./Logout";
+import Navbar from "../component/Navbar"
 import {useNavigate} from "react-router-dom"
 
 function Success() {
   const [welcomeData, setWelcomeData] = useState(null);
 
   const navigate = useNavigate();
+
   const handleLogout = (e) => {
     e.preventDefault();
     Logout();
@@ -22,7 +24,8 @@ function Success() {
 
   return (
     <>
-      <div>
+      <Navbar handleLogout={handleLogout}/>
+      <div className="flex flex-col justify-center items-center">
         <h2 className="mb-4">🎉 登入成功！</h2>
         {welcomeData && (
           <>
@@ -31,9 +34,6 @@ function Success() {
           </>
         )}
       </div>
-      <form onSubmit={handleLogout} className="mb-4">
-        <button type="submit">登出</button>
-      </form>
     </>
   );
 }
