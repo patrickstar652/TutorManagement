@@ -11,11 +11,11 @@ const { Pool } = require("pg");
 
 // 建立 PostgreSQL Pool
 const pool = new Pool({
-  user: "melanieliu",
-  host: "localhost",
-  database: "melanieliu",
-  password: "",
-  port: 5432,
+  user: process.env.db_user,
+  host: process.env.db_host,
+  database: process.env.db_database,
+  password: process.env.db_password,
+  port: process.env.db_port,
 });
 
 // 對應 GET /success
