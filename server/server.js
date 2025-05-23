@@ -22,9 +22,10 @@ app.use(express.json());
 
 
 // 同種類型的處理放一個檔案
-// const postRoutes = require('./routes/post');
+const postRoutes = require('./routes/post');
 const successRoutes = require('./routes/user');
 app.use('/', successRoutes); // 所有 /welcome 路由就掛上來了
+app.use('/', postRoutes); 
 
 
 // 啟動伺服器，開始監聽指定的埠號

@@ -10,4 +10,5 @@
   .btn {
     @apply w-full py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md mb-4
   }
+
 }
