@@ -28,10 +28,20 @@ router.post("/course", async (req, res) => {
 
 router.get("/showcourse", async (req, res) => {
   try {
-    const result = await pool.query("SELECT * FROM course");
-    res.status(200).json({ result });
-  } catch (error) {
-    console.error(error);
+    const result = await pool.query(
+      'SELECT "courseName", day, "startTime", "endTime", note FROM course ORDER BY day, "startTime"'
+    );
+    res.status(200).json(result.rows);// 陣列包物件
+    //[
+    // {
+    //   "courseName"
+    // },
+    // {
+    //   "courseName"
+    // }
+    //]
+  } catch (err) {
+    console.error(err);
   }
 });
 module.exports = router;
