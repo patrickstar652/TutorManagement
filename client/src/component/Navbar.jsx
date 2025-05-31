@@ -24,17 +24,20 @@ function Navbar() {
           <span className="font-semibold">炫揚文理</span>
         </span>
         <div className="flex justify-center gap-12 max-w-screen-xl mx-auto">
-          <Link className="hover:text-yellow-300 transition-colors font-medium">
+          <Link className="relative group text-blue-800 font-bold">
             首頁
+            <span className="underline"></span>
           </Link>
-          <Link className="hover:text-yellow-300 transition-colors font-medium">
+          <Link className="relative group text-blue-800 font-bold">
             登入
+            <span className="underline"></span>
           </Link>
           <Link
-            className="hover:text-yellow-300 transition-colors font-medium"
+            className="relative group text-blue-800 font-bold"
             onClick={handleLogout}
           >
             登出
+            <span className="underline"></span>
           </Link>
         </div>
         <span className="absolute right-6 top-1/2 -translate-y-1/2 flex items-center gap-2 bg-orange-300 px-4 py-1 rounded-full text-lg text-white">

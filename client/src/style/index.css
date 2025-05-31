@@ -11,4 +11,12 @@
     @apply w-full py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md mb-4
   }
 
+  .underline {
+    @apply absolute left-0 -bottom-1 w-0 h-[2px] bg-orange-500 transition-all duration-300;
+  }
+
+  .group:hover .underline {
+    @apply w-full;
+  }
+
 }
