@@ -12,11 +12,15 @@
   }
 
   .underline {
-    @apply absolute left-0 -bottom-1 w-0 h-[2px] bg-orange-500 transition-all duration-300;
+    @apply absolute left-0 -bottom-1 h-[2px] bg-orange-500 transition-all duration-300;
+    /* 使用 Tailwind 沒有提供的 CSS 屬性 */
+    width: 100%;
+    transform: scaleX(0);/*用於水平方向的縮放 完全壓縮*/
+    transform-origin: center;/*決定變形的起始點*/
   }
 
   .group:hover .underline {
-    @apply w-full;
+    transform: scaleX(1.3);/*原本大小*/
   }
 
 }

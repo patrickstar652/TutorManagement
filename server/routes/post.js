@@ -44,4 +44,12 @@ router.get("/showcourse", async (req, res) => {
     console.error(err);
   }
 });
+
+router.post("/class", async (req, res) => {
+  try {
+    
+    
+  } catch (error) {
+  }
+});
 module.exports = router;

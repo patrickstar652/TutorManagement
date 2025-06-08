@@ -77,7 +77,9 @@ function ShowCourse() {
 
     // 執行資料獲取函數
     fetchData();
-  }, []); // 空依賴陣列表示只在組件首次渲染時執行
+    // optional return function
+    // return () => {}
+  }, [courseTable]); //useEffect(() => { ... }, []) 就是在說：我只要在這一頁（元件）啟動時執行一次就好，不要重複執行
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -110,7 +112,9 @@ function ShowCourse() {
                 {Object.keys(weekdayMap).map((day) => (
                   <td
                     key={day}
-                    className="py-4 px-6 text-center whitespace-pre-line"
+                    className={`py-4 px-6 text-center whitespace-pre-line ${
+                      courseTable[slot][day] ? 'bg-amber-100 font-bold text-amber-900' : ''
+                    }`}
                   >
                     {courseTable[slot][day]}
                   </td>
