@@ -9,7 +9,19 @@ import { useState } from "react";
 function Navbar() {
   const [isDark, setIsDark] = useState(false);
   const token = localStorage.getItem("token");
-  let user_info = jwt_decode.jwtDecode(token);
+
+  // 安全地解碼 token
+  let user_info = null;
+  try {
+    if (token && token !== "null" && token !== "undefined") {
+      user_info = jwt_decode.jwtDecode(token);
+    }
+  } catch (error) {
+    console.error("Token 解碼失敗:", error);
+    // 清除無效的 token
+    localStorage.removeItem("token");
+  }
+
   const navigate = useNavigate();
 
   const handleLogout = (e) => {
@@ -31,31 +43,42 @@ function Navbar() {
           <span className="font-semibold">炫揚文理</span>
         </span>
         <div className="flex justify-center gap-12 max-w-screen-xl mx-auto">
-          <Link className="relative group text-blue-800 font-bold">
-            <div className="flex items-center gap-1">
-              <IoLogOutOutline className="text-2xl" />
-              <span>首頁</span>
-            </div>
-            <span className="underline"></span>
-          </Link>
-          <Link className="relative group text-blue-800 font-bold">
-            <div className="flex items-center gap-1">
-              <IoLogOutOutline className="text-2xl" />
-              <span>登入</span>
-            </div>
-            <span className="underline"></span>
-          </Link>
-          <Link
-            className="relative group text-blue-800 font-bold"
-            onClick={handleLogout}
-          >
-            {/* 調整登出 icon 和文字的排版 */}
-            <div className="flex items-center gap-1">
-              <IoLogOutOutline className="text-2xl" />
-              <span>登出</span>
-            </div>
-            <span className="underline"></span>
-          </Link>
+          {user_info ? (
+            <>
+              <Link className="relative group text-blue-800 font-bold" to={"/class"}>
+                <div className="flex items-center gap-1">
+                  <IoLogOutOutline className="text-2xl" />
+                  <span>班級</span>
+                </div>
+                <span className="underline"></span>
+              </Link>
+              
+              <Link className="relative group text-blue-800 font-bold" to={"/course"}>
+                <div className="flex items-center gap-1">
+                  <IoLogOutOutline className="text-2xl" />
+                  <span>課表</span>
+                </div>
+                <span className="underline"></span>
+              </Link>
+
+              <Link
+                className="relative group text-blue-800 font-bold"
+                onClick={handleLogout}
+              >
+                {/* 調整登出 icon 和文字的排版 */}
+                <div className="flex items-center gap-1">
+                  <IoLogOutOutline className="text-2xl" />
+                  <span>登出</span>
+                </div>
+                <span className="underline"></span>
+              </Link>
+            </>
+          ):(
+            <><div className="flex items-center gap-1 text-white">
+                <IoLogOutOutline className="text-2xl" />
+                <span>課表</span>
+              </div><span className="underline"></span></>
+          )}
         </div>
         <div className="absolute right-6 top-1/2 -translate-y-1/2 flex items-center gap-8">
           {/* 深淺色模式切換按鈕 */}
@@ -67,27 +90,38 @@ function Navbar() {
           >
             <FaSun
               className={`text-sm z-10 transition-all duration-700 ease-in-out ${
-                isDark ? "opacity-50 rotate-90 text-gray-400" : "text-amber-400 scale-110"
+                isDark
+                  ? "opacity-50 rotate-90 text-gray-400"
+                  : "text-amber-400 scale-110"
               }`}
             />
             <FaMoon
               className={`text-sm z-10 transition-all duration-700 ease-in-out ${
-                isDark ? "text-blue-200 scale-110" : "opacity-50 -rotate-90 text-amber-300"
+                isDark
+                  ? "text-blue-200 scale-110"
+                  : "opacity-50 -rotate-90 text-amber-300"
               }`}
             />
             <div
               className={`w-5 h-5 rounded-full shadow-md transform duration-700 ease-in-out absolute ${
-                isDark 
-                  ? "translate-x-7 bg-gray-900" 
-                  : "left-1 bg-white"
+                isDark ? "translate-x-7 bg-gray-900" : "left-1 bg-white"
               }`}
             ></div>
           </button>
 
           {/* 使用者名稱 */}
-          <span className="flex items-center gap-2 bg-orange-300 px-4 py-1 rounded-full text-lg text-white">
-            {user_info.account}
-          </span>
+          {user_info ? (
+            <span className="flex items-center gap-2 bg-orange-300 px-4 py-1 rounded-full text-lg text-white">
+              {user_info.account}
+            </span>
+          ) : (
+            <Link
+              to="/login"
+              className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 px-4 py-1 rounded-full text-lg text-white transition-colors"
+            >
+              登入
+            </Link>
+          )}
         </div>
       </nav>
     </>

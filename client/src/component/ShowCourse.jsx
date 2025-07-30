@@ -24,8 +24,15 @@ function ShowCourse() {
     // 定義非同步函數獲取課程資料
     const fetchData = async () => {
       try {
-        // 發送 GET 請求獲取課程資料
-        const res = await axios.get("http://localhost:3000/showcourse");
+        // 取得 token
+        const token = localStorage.getItem('token');
+        
+        // 發送 GET 請求獲取課程資料，包含 Authorization header
+        const res = await axios.get("http://localhost:3000/showcourse", {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
         // 儲存原始課程資料
         setCourse(res.data);
 

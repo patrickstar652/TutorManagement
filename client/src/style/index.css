@@ -2,6 +2,33 @@
 @tailwind components;
 @tailwind utilities;
 
+/* @layer base {
+  html {
+    min-height: 100vh;
+  }
+  
+  body {
+    position: relative;
+    min-height: 100vh;
+    background-image: url('https://images.unsplash.com/photo-1749371930398-c5e7f03f1375?w=1920&auto=format&fit=crop&q=80&ixlib=rb-4.1.0');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+  }
+  
+  body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.6); /* 白色遮罩來降低透明度 */
+    z-index: -1;
+  /* } */
+/* } */ 
+
 @layer components {
   .input {
     @apply flex-1 px-3 py-1.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 mb-4;
@@ -13,14 +40,12 @@
 
   .underline {
     @apply absolute left-0 -bottom-1 h-[2px] bg-orange-500 transition-all duration-300;
-    /* 使用 Tailwind 沒有提供的 CSS 屬性 */
     width: 100%;
-    transform: scaleX(0);/*用於水平方向的縮放 完全壓縮*/
-    transform-origin: center;/*決定變形的起始點*/
+    transform: scaleX(0);
+    transform-origin: center;
   }
 
   .group:hover .underline {
-    transform: scaleX(1.3);/*原本大小*/
+    transform: scaleX(1.3);
   }
-
 }

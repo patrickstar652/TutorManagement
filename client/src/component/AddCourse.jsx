@@ -15,12 +15,18 @@ function AddCourse() {
   const handleForm = async (e) => {
     e.preventDefault();
     try {
+        const token = localStorage.getItem('token');
+        
         await axios.post("http://localhost:3000/course", {
         courseName,
         day,
         startTime: startTime.format("HH:mm"),
         endTime: endTime.format("HH:mm"),
         note,
+    }, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
     });
     close();
     }

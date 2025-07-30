@@ -1,33 +1,55 @@
 import './style/App.css'
 import Login from './pages/Login'
 import Success from './pages/Success'
-import Course from './pages/course'
+import Course from './pages/Course'
 import Class from './pages/Class'
 import Seat from './pages/Seat' 
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import Home from './pages/Home'
+import ProtectedRoute from './component/ProtectedRoute'
 
 function App() {
   const router = createBrowserRouter([
     {
       path: "/",
-      element: <Login />,
+      element: <Home />,
     },
     {
       path: "/success",
-      element: <Success />,
+      element: (
+        <ProtectedRoute>
+          <Success />
+        </ProtectedRoute>
+      ),
     },
     {
       path: "/course",
-      element: <Course />
+      element: (
+        <ProtectedRoute>
+          <Course />
+        </ProtectedRoute>
+      )
     },
     {
       path: "/class",
-      element: <Class />
+      element: (
+        <ProtectedRoute>
+          <Class />
+        </ProtectedRoute>
+      )
     },
     {
-      path: "/class/seat",
-      element: <Seat />
-    }
+      path: "/class/seat/:courseId",
+      element: (
+        <ProtectedRoute>
+          <Seat />
+        </ProtectedRoute>
+      )
+    },
+    {
+      path: "/login",
+      element: <Login />
+    },
   ])
   
   return (

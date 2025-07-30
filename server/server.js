@@ -10,7 +10,7 @@ const PORT = 3000;
 // 啟用 CORS，允許任何來源的跨域請求
 app.use(cors({
   origin: '*',                // 允許所有來源（＊表示不限制）
-  methods: ['GET', 'POST', 'OPTIONS'],  // 允許這些 HTTP 方法
+  methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE','OPTIONS'],  // 允許這些 HTTP 方法
   allowedHeaders: '*',         // 允許所有標頭
   credentials: false           // 不允許附帶 cookie
 }));
@@ -19,7 +19,6 @@ app.use(cors({
 // 解析前端送來的 JSON 格式資料 註冊中介層
 // middleware 的主要用途就是處理在 request 到達你的路由之前，或者在 response 返回給用戶之前所需要做的各種操作
 app.use(express.json());
-
 
 // 同種類型的處理放一個檔案
 const postRoutes = require('./routes/post');
@@ -32,9 +31,6 @@ app.use('/', postRoutes);
 app.listen(PORT, () => {
   console.log(`✅ Server running at http://localhost:${PORT}`);
 });
-
-
-
 
 //403 跨域禁止
 //400 請求格式錯誤 (少資料)
