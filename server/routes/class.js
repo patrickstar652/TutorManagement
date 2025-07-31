@@ -27,83 +27,6 @@ const loggerMiddleware = (req, res, next) => {
 
 router.use(loggerMiddleware);
 
-router.post("/course", async (req, res) => {
-  const { courseName, day, startTime, endTime, note } = req.body;
-  
-  console.log("📝 收到新增課程請求:", { courseName, day, startTime, endTime, note });
-  
-  try {
-    // 開始交易
-    await pool.query("BEGIN");
-
-    // 1. 插入課程並取得產生的 ID
-    const courseResult = await pool.query(
-      'INSERT INTO course ("courseName", day, "startTime", "endTime", note) VALUES ($1, $2, $3, $4, $5) RETURNING id',
-      [courseName, day, startTime, endTime, note]
-    );
-
-    const courseId = courseResult.rows[0].id;
-
-    // 2. 將 course_id 插入到 class 表
-    await pool.query("INSERT INTO class (course_id) VALUES ($1)", [courseId]);
-
-    // 提交交易
-    await pool.query("COMMIT");
-
-    res.status(200).json({
-      success: true,
-      message: "新增成功",
-      courseId: courseId,
-    });
-  } catch (error) {
-    // 發生錯誤時回滾交易
-    await pool.query("ROLLBACK");
-    console.error("Database error:", error);
-    res.status(500).json({
-      success: false,
-      message: "新增失敗",
-      error: error.message,
-    });
-  }
-});
-
-router.get("/showcourse", async (req, res) => {
-  try {
-    const result = await pool.query(
-      'SELECT id, "courseName", day, "startTime", "endTime", note FROM course ORDER BY day, "startTime"'
-    );
-    res.status(200).json(result.rows);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Database query failed" });
-  }
-});
-
-router.delete("/deletecourse/:courseId", async (req, res) => {
-  const courseId = req.params.courseId;
-  try {
-    await pool.query("BEGIN");
-    
-    // 先刪除 class 表中的相關資料
-    const classResult = await pool.query(
-      "DELETE FROM class WHERE course_id = $1 RETURNING *",
-      [courseId]
-    );
-    
-    // 再刪除 course 表中的資料
-    const courseResult = await pool.query(
-      "DELETE FROM course WHERE id = $1 RETURNING *",
-      [courseId]
-    );
-    await pool.query("COMMIT");
-
-  } catch (error) {
-    await pool.query("ROLLBACK");
-    console.error("刪除課程失敗：", error);
-    res.status(500).json({ error: "Database query failed" });
-  }
-});
-// -----------------------------------------------------------
 router.get("/class", async (req, res) => {
   try {
     const result = await pool.query(
@@ -220,4 +143,6 @@ router.get("/seat/:courseId", async (req, res) => {
   }
 });
 
+router.post("/class/reminder", async (req, res) => {
+})
 module.exports = router;

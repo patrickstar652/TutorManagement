@@ -7,7 +7,7 @@ function AddCourse() {
     document.querySelector(".popupWindow").classList.add("hidden");
   };
   const [courseName, setCourseName] = useState("");
-  const [day, setDay] = useState(0);
+  const [day, setDay] = useState(""); // 空字串，強制用戶選擇
   const [startTime, setStartTime] = useState(null);
   const [endTime, setEndTime] = useState(null);
   const [note, setNote] = useState("");
@@ -17,13 +17,15 @@ function AddCourse() {
     try {
         const token = localStorage.getItem('token');
         
-        await axios.post("http://localhost:3000/course", {
-        courseName,
-        day,
-        startTime: startTime.format("HH:mm"),
-        endTime: endTime.format("HH:mm"),
-        note,
-    }, {
+        const courseData = {
+          courseName,
+          day,
+          startTime: startTime.format("HH:mm"),
+          endTime: endTime.format("HH:mm"),
+          note,
+        };
+        
+        await axios.post("http://localhost:3000/course", courseData, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -31,7 +33,7 @@ function AddCourse() {
     close();
     }
     catch (error) {
-        console.error(error);
+        console.error("❌ 新增課程失敗:", error);
     }
     
   };
@@ -42,7 +44,7 @@ function AddCourse() {
           <div className="relative bg-white rounded-xl shadow-2xl w-[30rem] p-8 z-50 animate-fadeIn">
             <form onSubmit={handleForm}>
               <h3 className="text-xl font-semibold text-gray-800 text-center mb-6">
-                課程編輯
+                加入課表
               </h3>
               <div className="flex flex-col space-y-4">
                 <div className="flex flex-col space-y-2">
@@ -69,7 +71,7 @@ function AddCourse() {
                     value={day}
                     onChange={(e) => setDay(Number(e.target.value))}
                   >
-                    <option disabled hidden>
+                    <option value="" disabled>
                       請選擇星期
                     </option>
                     <option value={1}>星期一</option>
