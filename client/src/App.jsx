@@ -39,7 +39,7 @@ function App() {
       )
     },
     {
-      path: "/class/seat/:courseId",
+      path: "/class/seat/:scheduleId",
       element: (
         <ProtectedRoute>
           <Seat />

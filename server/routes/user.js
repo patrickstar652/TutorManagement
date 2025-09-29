@@ -29,9 +29,8 @@ router.get("/success", (req, res) => {
 // 定義「登入」API 註冊路由
 // req 使用者傳來的請求，包括 body、headers、method 等資訊
 // res 伺服器回應用的工具，可用來回傳 JSON、狀態碼等
-
 router.post("/login", async (req, res) => {
-  const { account, password } = req.body;
+  const { account, password } = req.body || {}; // 加入防呆，避免 req.body 是 undefined
 
   // if (!account || !password) {
   //   return res
@@ -40,9 +39,11 @@ router.post("/login", async (req, res) => {
   // }
 
   try {
-    const result = await pool.query("SELECT * FROM users WHERE account = $1", [
-      account, //將變數帶入 $1 的位置
-    ]);
+    // 只取需要的欄位
+    const result = await pool.query(
+      "SELECT id, account, password FROM users WHERE account = $1",
+      [account] // 將變數帶入 $1 的位置
+    );
 
     // if (result.rows.length === 0) {
     //   return res.status(401).json({ success: false, message: "帳號不存在" });
@@ -50,28 +51,29 @@ router.post("/login", async (req, res) => {
 
     const user = result.rows[0];
 
-    if (account == user.account && password == user.password) {
-      const token = jwt.sign({ account: user.account }, SECRET_KEY, {
-        expiresIn: "1h",
-      });
+    if (user && account === user.account && password === user.password) {
+      // ⚠️ 關鍵：把 id 一起放進 token，後續 authMiddleware 會檢查 payload.id
+      // 登入成功後：
+      const token = jwt.sign(
+        { id: user.id, account: user.account }, // 一定要帶 id
+        SECRET_KEY,
+        { expiresIn: "12h" }  
+      );
 
       res.json({
         success: true,
         message: "登入成功",
-        token,// 傳這個就好
+        token,
+        userId: user.id,
       });
-    }
-
-    else {
+    } else {
       res.status(401).json({ success: false, message: "帳號或密碼錯誤" });
     }
-  } 
-  
-  catch (err) {
-    console.error("登入錯誤：", err.message); // 後端顯示錯誤
+  } catch (err) {
+    console.error("登入錯誤：", err); // 後端顯示錯誤
     res.status(500).json({
       success: false,
-      message: "伺服器錯誤，請稍後再試",     // 回傳錯誤訊息給前端
+      message: "伺服器錯誤，請稍後再試", // 回傳錯誤訊息給前端
     });
   }
 });

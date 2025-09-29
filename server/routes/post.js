@@ -6,7 +6,6 @@ const jwt = require("jsonwebtoken");
 const SECRET_KEY = process.env.SECRET_KEY;
 
 const { Pool } = require("pg");
-
 const pool = new Pool({
   user: process.env.db_user,
   host: process.env.db_host,
@@ -15,208 +14,132 @@ const pool = new Pool({
   port: process.env.db_port,
 });
 
-const loggerMiddleware = (req, res, next) => {
-  const token = req.headers.authorization?.split(" ")[1];
-  
-  if (!token) {
-    return res.status(401).json({ message: "Token 未提供" });
-  }
+/** JWT 驗證：token 需含 { id, account } */
+const authMiddleware = (req, res, next) => {
+  const auth = req.headers.authorization || "";
+  const token = auth.startsWith("Bearer ") ? auth.slice(7) : null;
+  if (!token) return res.status(401).json({ message: "Token 未提供" });
 
-  next();
+  try {
+    const payload = jwt.verify(token, SECRET_KEY);
+    if (!payload?.id) {
+      return res.status(401).json({ message: "Token 無效：缺少使用者 id" });
+    }
+    req.user = { id: payload.id, account: payload.account };
+    next();
+  } catch (err) {
+    console.error("JWT 驗證失敗：", err);
+    return res.status(401).json({ message: "Token 無效或已過期" });
+  }
 };
 
-router.use(loggerMiddleware);
+router.use(authMiddleware);
 
+/**
+ * POST /course
+ * 新增課程到 schedule，並同步建立一筆 class（帶入 course_name）
+ * Body: { course_name, weekday, start_time, end_time, note? }
+ */
 router.post("/course", async (req, res) => {
-  const { courseName, day, startTime, endTime, note } = req.body;
-  
-  console.log("📝 收到新增課程請求:", { courseName, day, startTime, endTime, note });
-  
+  const { course_name, weekday, start_time, end_time } = req.body || {};
+
+  if (!course_name || !weekday || !start_time || !end_time) {
+    return res.status(400).json({
+      success: false,
+      message: "course_name、weekday、start_time、end_time 為必填",
+    });
+  }
+
   try {
-    // 開始交易
     await pool.query("BEGIN");
 
-    // 1. 插入課程並取得產生的 ID
-    const courseResult = await pool.query(
-      'INSERT INTO course ("courseName", day, "startTime", "endTime", note) VALUES ($1, $2, $3, $4, $5) RETURNING id',
-      [courseName, day, startTime, endTime, note]
+    // 1) 建立 schedule
+    const insScheduleSql = `
+      INSERT INTO schedule (course_name, weekday, start_time, end_time, user_id)
+      VALUES ($1, $2, $3, $4, $5)
+      RETURNING id, course_name
+    `;
+    const sRes = await pool.query(insScheduleSql, [
+      course_name,
+      Number(weekday),
+      start_time,
+      end_time,
+      req.user.id,
+    ]);
+    const scheduleId = sRes.rows[0].id;
+    const returnedCourseName = sRes.rows[0].course_name;
+
+    // 2) 同步建立 class，帶入 course_name（你有設外鍵/或快取欄位）
+    await pool.query(
+      `INSERT INTO class (schedule_id, course_name) VALUES ($1, $2)`,
+      [scheduleId, returnedCourseName]
     );
 
-    const courseId = courseResult.rows[0].id;
-
-    // 2. 將 course_id 插入到 class 表
-    await pool.query("INSERT INTO class (course_id) VALUES ($1)", [courseId]);
-
-    // 提交交易
     await pool.query("COMMIT");
-
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
-      message: "新增成功",
-      courseId: courseId,
+      message: "新增課程成功",
+      schedule_id: scheduleId,
     });
-  } catch (error) {
-    // 發生錯誤時回滾交易
+  } catch (err) {
     await pool.query("ROLLBACK");
-    console.error("Database error:", error);
-    res.status(500).json({
-      success: false,
-      message: "新增失敗",
-      error: error.message,
-    });
+    console.error("新增課程失敗：", err);
+    return res.status(500).json({ success: false, message: "新增失敗", error: err.message });
   }
 });
 
+/**
+ * GET /showcourse
+ * 取得目前登入老師的所有課程（純 schedule）
+ * 回傳欄位：id, course_name, weekday, start_time, end_time, note
+ */
 router.get("/showcourse", async (req, res) => {
   try {
-    const result = await pool.query(
-      'SELECT id, "courseName", day, "startTime", "endTime", note FROM course ORDER BY day, "startTime"'
-    );
-    res.status(200).json(result.rows);
+    const sql = `
+      SELECT id, course_name, weekday, start_time, end_time
+      FROM schedule
+      WHERE user_id = $1
+      ORDER BY weekday, start_time
+    `;
+    const result = await pool.query(sql, [req.user.id]);
+    return res.status(200).json(result.rows);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Database query failed" });
+    console.error("查詢課程失敗：", err);
+    return res.status(500).json({ error: "Database query failed" });
   }
 });
 
-router.delete("/deletecourse/:courseId", async (req, res) => {
-  const courseId = req.params.courseId;
+/**
+ * DELETE /deletecourse/:scheduleId
+ * 刪除單一課程（先刪 class，再刪 schedule），只允許刪自己的
+ */
+router.delete("/deletecourse/:scheduleId", async (req, res) => {
+  const scheduleId = Number(req.params.scheduleId || 0);
+  if (!scheduleId) return res.status(400).json({ error: "scheduleId 無效" });
+
   try {
     await pool.query("BEGIN");
-    
-    // 先刪除 class 表中的相關資料
-    const classResult = await pool.query(
-      "DELETE FROM class WHERE course_id = $1 RETURNING *",
-      [courseId]
+
+    // 只能刪自己的課
+    const own = await pool.query(
+      "SELECT 1 FROM schedule WHERE id = $1 AND user_id = $2",
+      [scheduleId, req.user.id]
     );
-    
-    // 再刪除 course 表中的資料
-    const courseResult = await pool.query(
-      "DELETE FROM course WHERE id = $1 RETURNING *",
-      [courseId]
-    );
+    if (own.rowCount === 0) {
+      await pool.query("ROLLBACK");
+      return res.status(403).json({ error: "無權刪除此課程" });
+    }
+
+    // 先刪 class，再刪 schedule
+    await pool.query("DELETE FROM class WHERE schedule_id = $1", [scheduleId]);
+    await pool.query("DELETE FROM schedule WHERE id = $1", [scheduleId]);
+
     await pool.query("COMMIT");
-
-  } catch (error) {
-    await pool.query("ROLLBACK");
-    console.error("刪除課程失敗：", error);
-    res.status(500).json({ error: "Database query failed" });
-  }
-});
-// -----------------------------------------------------------
-router.get("/class", async (req, res) => {
-  try {
-    const result = await pool.query(
-      'SELECT course_id, "courseName" FROM class JOIN course ON class.course_id = course.id'
-    );
-    res.status(200).json(result.rows);
+    return res.status(200).json({ success: true, message: "刪除成功" });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Database query failed" });
-  }
-});
-
-router.patch("/seat", async (req, res) => {
-  const { course_id, seat_id, name } = req.body;
-
-  try {
-    // 驗證必要欄位
-    if (!course_id || !seat_id) {
-      return res.status(400).json({
-        success: false,
-        message: "course_id 和 seat_id 是必要欄位",
-      });
-    }
-
-    // 先取得現有的 students 陣列
-    const currentResult = await pool.query(
-      "SELECT students FROM class WHERE course_id = $1",
-      [course_id]
-    );
-
-    if (currentResult.rows.length === 0) {
-      return res.status(404).json({
-        success: false,
-        message: "找不到指定的課程",
-      });
-    }
-
-    // 取得現有的 students 陣列，如果為 null 則建立空陣列
-    let students = currentResult.rows[0].students || [];
-
-    // 建立新的座位字串格式: "seat_id:name"
-    const seatString = `${seat_id}:${name || ""}`;
-
-    // 檢查是否已存在該座位
-    const existingIndex = students.findIndex((student) =>
-      student.startsWith(`${seat_id}:`)
-    );
-
-    if (existingIndex >= 0) {
-      // 更新現有座位
-      students[existingIndex] = seatString;
-    } else {
-      // 新增座位
-      students.push(seatString);
-    }
-
-    // 更新資料庫，使用 PostgreSQL 陣列語法
-    const result = await pool.query(
-      "UPDATE class SET students = $1::text[] WHERE course_id = $2 RETURNING *",
-      [students, course_id]
-    );
-
-    res.status(200).json({
-      success: true,
-      message: "座位資料更新成功",
-      data: result.rows[0],
-    });
-  } catch (error) {
-    console.error("更新座位資料錯誤:", error);
-    res.status(500).json({
-      success: false,
-      message: "更新失敗",
-      error: error.message,
-    });
-  }
-});
-
-// 取得座位資料
-router.get("/seat/:courseId", async (req, res) => {
-  const { courseId } = req.params;
-
-  try {
-    const result = await pool.query(
-      "SELECT students FROM class WHERE course_id = $1",
-      [courseId]
-    );
-
-    if (result.rows.length === 0) {
-      return res.status(404).json({
-        success: false,
-        message: "找不到指定的課程",
-      });
-    }
-
-    const students = result.rows[0].students || [];
-
-    // 將字串陣列轉換為物件陣列
-    const seatsData = students.map((student) => {
-      const [seat_id, name] = student.split(":");
-      return { seat_id, name };
-    });
-
-    res.status(200).json({
-      success: true,
-      data: seatsData,
-    });
-  } catch (error) {
-    console.error("取得座位資料錯誤:", error);
-    res.status(500).json({
-      success: false,
-      message: "取得資料失敗",
-      error: error.message,
-    });
+    await pool.query("ROLLBACK");
+    console.error("刪除課程失敗：", err);
+    return res.status(500).json({ error: "Database query failed" });
   }
 });
 

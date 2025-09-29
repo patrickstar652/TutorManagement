@@ -1,11 +1,12 @@
 import Navbar from "../component/Navbar";
 import AddSeat from "../component/AddSeat";
+import Sidebar from "../component/Sidebar";
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import axios from "axios";
 
 function Seat() {
-  const { courseId } = useParams();
+  const { scheduleId } = useParams();
   const [showModal, setShowModal] = useState(false);
   const [selectedSeatId, setSelectedSeatId] = useState(null);
   const [seatData, setSeatData] = useState({});
@@ -15,7 +16,7 @@ function Seat() {
     const fetchSeatData = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.get(`http://localhost:3000/seat/${courseId}`, {
+        const response = await axios.get(`http://localhost:3000/seat/${scheduleId}`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -32,10 +33,10 @@ function Seat() {
       }
     };
 
-    if (courseId) {
+    if (scheduleId) {
       fetchSeatData();
     }
-  }, [courseId]);
+  }, [scheduleId]);
 
   const handleSeatClick = (seatId) => {
     setSelectedSeatId(seatId);
@@ -52,7 +53,7 @@ function Seat() {
     const fetchSeatData = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.get(`http://localhost:3000/seat/${courseId}`, {
+        const response = await axios.get(`http://localhost:3000/seat/${scheduleId}`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -103,6 +104,7 @@ function Seat() {
   return (
     <>
       <Navbar />
+      <Sidebar />
       <div className="flex flex-col items-center mt-6">
         <h1 className="text-center text-4xl font-bold bg-gradient-to-r from-orange-600 via-orange-500 to-orange-400 bg-clip-text text-transparent">班級狀況</h1>
         <div className="h-1.5 w-40 bg-gradient-to-r from-orange-500 to-orange-300 rounded-full mt-1"></div>
@@ -292,7 +294,7 @@ function Seat() {
       {/* Modal */}
       {showModal && (
         <AddSeat 
-          courseId={courseId} 
+          scheduleId={scheduleId} 
           seatId={selectedSeatId}
           onClose={handleCloseModal}
           onSave={handleSaveSuccess}

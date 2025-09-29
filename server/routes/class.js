@@ -29,9 +29,17 @@ router.use(loggerMiddleware);
 
 router.get("/class", async (req, res) => {
   try {
-    const result = await pool.query(
-      'SELECT course_id, "courseName" FROM class JOIN course ON class.course_id = course.id'
-    );
+    const result = await pool.query(`
+      SELECT 
+        c.id as class_id,
+        c.schedule_id,
+        s.course_name,
+        s.weekday,
+        s.start_time,
+        s.end_time
+      FROM class c 
+      JOIN schedule s ON c.schedule_id = s.id
+    `);
     res.status(200).json(result.rows);
   } catch (err) {
     console.error(err);
@@ -40,21 +48,21 @@ router.get("/class", async (req, res) => {
 });
 
 router.patch("/seat", async (req, res) => {
-  const { course_id, seat_id, name } = req.body;
+  const { schedule_id, seat_id, name } = req.body;
 
   try {
     // 驗證必要欄位
-    if (!course_id || !seat_id) {
+    if (!schedule_id || !seat_id) {
       return res.status(400).json({
         success: false,
-        message: "course_id 和 seat_id 是必要欄位",
+        message: "schedule_id 和 seat_id 是必要欄位",
       });
     }
 
-    // 先取得現有的 students 陣列
+    // 先取得現有的 members 陣列
     const currentResult = await pool.query(
-      "SELECT students FROM class WHERE course_id = $1",
-      [course_id]
+      "SELECT members FROM class WHERE schedule_id = $1",
+      [schedule_id]
     );
 
     if (currentResult.rows.length === 0) {
@@ -64,29 +72,29 @@ router.patch("/seat", async (req, res) => {
       });
     }
 
-    // 取得現有的 students 陣列，如果為 null 則建立空陣列
-    let students = currentResult.rows[0].students || [];
+    // 取得現有的 members 陣列，如果為 null 則建立空陣列
+    let members = currentResult.rows[0].members || [];
 
     // 建立新的座位字串格式: "seat_id:name"
     const seatString = `${seat_id}:${name || ""}`;
 
     // 檢查是否已存在該座位
-    const existingIndex = students.findIndex((student) =>
-      student.startsWith(`${seat_id}:`)
+    const existingIndex = members.findIndex((member) =>
+      member.startsWith(`${seat_id}:`)
     );
 
     if (existingIndex >= 0) {
       // 更新現有座位
-      students[existingIndex] = seatString;
+      members[existingIndex] = seatString;
     } else {
       // 新增座位
-      students.push(seatString);
+      members.push(seatString);
     }
 
     // 更新資料庫，使用 PostgreSQL 陣列語法
     const result = await pool.query(
-      "UPDATE class SET students = $1::text[] WHERE course_id = $2 RETURNING *",
-      [students, course_id]
+      "UPDATE class SET members = $1::text[] WHERE schedule_id = $2 RETURNING *",
+      [members, schedule_id]
     );
 
     res.status(200).json({
@@ -105,13 +113,13 @@ router.patch("/seat", async (req, res) => {
 });
 
 // 取得座位資料
-router.get("/seat/:courseId", async (req, res) => {
-  const { courseId } = req.params;
+router.get("/seat/:scheduleId", async (req, res) => {
+  const { scheduleId } = req.params;
 
   try {
     const result = await pool.query(
-      "SELECT students FROM class WHERE course_id = $1",
-      [courseId]
+      "SELECT members FROM class WHERE schedule_id = $1",
+      [scheduleId]
     );
 
     if (result.rows.length === 0) {
@@ -121,11 +129,11 @@ router.get("/seat/:courseId", async (req, res) => {
       });
     }
 
-    const students = result.rows[0].students || [];
+    const members = result.rows[0].members || [];
 
     // 將字串陣列轉換為物件陣列
-    const seatsData = students.map((student) => {
-      const [seat_id, name] = student.split(":");
+    const seatsData = members.map((member) => {
+      const [seat_id, name] = member.split(":");
       return { seat_id, name };
     });
 

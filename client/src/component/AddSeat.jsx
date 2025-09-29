@@ -1,7 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 
-function AddSeat({ courseId, seatId, onClose, onSave }) { // 接收 onSave props
+function AddSeat({ scheduleId, seatId, onClose, onSave }) { // 接收 onSave props
   const [name, setName] = useState("");
   
   const close = () => {
@@ -14,7 +14,7 @@ function AddSeat({ courseId, seatId, onClose, onSave }) { // 接收 onSave props
     try {
       const token = localStorage.getItem('token');
       await axios.patch("http://localhost:3000/seat", { // 改為 PATCH
-        course_id: courseId,
+        schedule_id: scheduleId,
         seat_id: seatId,
         name
       }, {
