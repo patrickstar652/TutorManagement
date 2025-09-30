@@ -56,6 +56,19 @@ function AddCourse() {
       close();
     } catch (error) {
       console.error("❌ 新增課程失敗:", error);
+      
+      // 處理錯誤訊息
+      let errorMessage = "新增課程失敗，請稍後再試";
+      
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.response?.data?.error) {
+        errorMessage = error.response.data.error;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      alert(errorMessage);
     }
   };
 

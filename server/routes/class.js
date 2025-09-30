@@ -22,7 +22,17 @@ const loggerMiddleware = (req, res, next) => {
     return res.status(401).json({ message: "Token 未提供" });
   }
 
-  next();
+  try {
+    const payload = jwt.verify(token, SECRET_KEY);
+    if (!payload?.id) {
+      return res.status(401).json({ message: "Token 無效：缺少使用者 id" });
+    }
+    req.user = { id: payload.id, account: payload.account };
+    next();
+  } catch (err) {
+    console.error("JWT 驗證失敗：", err);
+    return res.status(401).json({ message: "Token 無效或已過期" });
+  }
 };
 
 router.use(loggerMiddleware);
@@ -39,7 +49,8 @@ router.get("/class", async (req, res) => {
         s.end_time
       FROM class c 
       JOIN schedule s ON c.schedule_id = s.id
-    `);
+      WHERE c.user_id = $1
+    `, [req.user.id]);
     res.status(200).json(result.rows);
   } catch (err) {
     console.error(err);
@@ -59,10 +70,10 @@ router.patch("/seat", async (req, res) => {
       });
     }
 
-    // 先取得現有的 members 陣列
+    // 先取得現有的 members 陣列並檢查權限
     const currentResult = await pool.query(
-      "SELECT members FROM class WHERE schedule_id = $1",
-      [schedule_id]
+      "SELECT members FROM class WHERE schedule_id = $1 AND user_id = $2",
+      [schedule_id, req.user.id]
     );
 
     if (currentResult.rows.length === 0) {
@@ -93,8 +104,8 @@ router.patch("/seat", async (req, res) => {
 
     // 更新資料庫，使用 PostgreSQL 陣列語法
     const result = await pool.query(
-      "UPDATE class SET members = $1::text[] WHERE schedule_id = $2 RETURNING *",
-      [members, schedule_id]
+      "UPDATE class SET members = $1::text[] WHERE schedule_id = $2 AND user_id = $3 RETURNING *",
+      [members, schedule_id, req.user.id]
     );
 
     res.status(200).json({
@@ -118,8 +129,8 @@ router.get("/seat/:scheduleId", async (req, res) => {
 
   try {
     const result = await pool.query(
-      "SELECT members FROM class WHERE schedule_id = $1",
-      [scheduleId]
+      "SELECT members FROM class WHERE schedule_id = $1 AND user_id = $2",
+      [scheduleId, req.user.id]
     );
 
     if (result.rows.length === 0) {
@@ -151,6 +162,4 @@ router.get("/seat/:scheduleId", async (req, res) => {
   }
 });
 
-router.post("/class/reminder", async (req, res) => {
-})
 module.exports = router;

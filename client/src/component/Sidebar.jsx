@@ -3,7 +3,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { FaUsers, FaCalendarAlt } from "react-icons/fa";
 import { useState } from "react";
 import AddReminder from "./AddReminder";
-import Reminder from "./Reminder";
 
 function Sidebar() {
 	const location = useLocation();
@@ -42,7 +41,7 @@ function Sidebar() {
 			</div>
 
 			{showReminder && (
-				<Reminder onClose={() => setShowReminder(false)} />
+				<AddReminder onClose={() => setShowReminder(false)} />
 			)}
 
 			{showPayment && (

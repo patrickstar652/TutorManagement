@@ -53,7 +53,7 @@ router.post("/course", async (req, res) => {
   try {
     await pool.query("BEGIN");
 
-    // 1) 建立 schedule
+    // 1) 建立 schedule，允許同名課程
     const insScheduleSql = `
       INSERT INTO schedule (course_name, weekday, start_time, end_time, user_id)
       VALUES ($1, $2, $3, $4, $5)
@@ -69,10 +69,10 @@ router.post("/course", async (req, res) => {
     const scheduleId = sRes.rows[0].id;
     const returnedCourseName = sRes.rows[0].course_name;
 
-    // 2) 同步建立 class，帶入 course_name（你有設外鍵/或快取欄位）
+    // 2) 同步建立 class，加上 user_id
     await pool.query(
-      `INSERT INTO class (schedule_id, course_name) VALUES ($1, $2)`,
-      [scheduleId, returnedCourseName]
+      `INSERT INTO class (schedule_id, user_id) VALUES ($1, $2)`,
+      [scheduleId, req.user.id]
     );
 
     await pool.query("COMMIT");
@@ -84,7 +84,14 @@ router.post("/course", async (req, res) => {
   } catch (err) {
     await pool.query("ROLLBACK");
     console.error("新增課程失敗：", err);
-    return res.status(500).json({ success: false, message: "新增失敗", error: err.message });
+    console.error("錯誤代碼：", err.code);
+    console.error("約束名稱：", err.constraint);
+    
+    return res.status(500).json({ 
+      success: false, 
+      message: "新增失敗", 
+      error: err.message 
+    });
   }
 });
 
