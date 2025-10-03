@@ -1,14 +1,38 @@
 
-import { useLocation, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { FaUsers, FaCalendarAlt } from "react-icons/fa";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AddReminder from "./AddReminder";
+import axios from "axios";
 
 function Sidebar() {
-	const location = useLocation();
-	const navigate = useNavigate();
+	const { scheduleId } = useParams(); // 從路由參數取得
 	const [showReminder, setShowReminder] = useState(false);
 	const [showPayment, setShowPayment] = useState(false);
+	const [courseName, setCourseName] = useState("");
+
+	// 如果在座位頁面，取得課程名稱
+	useEffect(() => {
+		if (scheduleId) {
+			const fetchCourseName = async () => {
+				try {
+					const token = localStorage.getItem('token');
+					const response = await axios.get('http://localhost:3000/class', {
+						headers: {
+							Authorization: `Bearer ${token}`
+						}
+					});
+					const course = response.data.find(c => c.schedule_id == scheduleId);
+					if (course) {
+						setCourseName(course.course_name);
+					}
+				} catch (error) {
+					console.error("取得課程資訊失敗:", error);
+				}
+			};
+			fetchCourseName();
+		}
+	}, [scheduleId]);
 
 	return (
 		<>
@@ -41,7 +65,11 @@ function Sidebar() {
 			</div>
 
 			{showReminder && (
-				<AddReminder onClose={() => setShowReminder(false)} />
+				<AddReminder 
+					onClose={() => setShowReminder(false)}
+					scheduleId={scheduleId}
+					courseName={courseName}
+				/>
 			)}
 
 			{showPayment && (
@@ -66,5 +94,4 @@ function Sidebar() {
 		</>
 	);
 }
-
 export default Sidebar;

@@ -2,7 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 import { FaBell, FaCalendarAlt, FaClock, FaStickyNote } from "react-icons/fa";
 
-function Reminder({ onClose }) {
+function AddReminder({ onClose, scheduleId, courseName }) {
   const [formData, setFormData] = useState({
     title: "",
     content: "",
@@ -18,29 +18,59 @@ function Reminder({ onClose }) {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // 在這裡添加提交邏輯
-    try {
-      const req = async () => {
-        await axios.post("http://localhost:3000/reminder", {
-          title: formData.title,
-          description: formData.content,
-          remind_date: formData.date,
-          remind_at: formData.time
-        }, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`
-          }
-        }); 
-      }
-
-    }catch (err) {
-      console.error("建立提醒失敗:", err);
-      alert("建立提醒失敗，請稍後再試");
+    
+    // 驗證必要欄位
+    if (!formData.title || !formData.date) {
+      alert("請填寫標題和日期");
       return;
     }
-    if (onClose) onClose();
+
+    // 確保有 scheduleId（從課程頁面傳入）
+    if (!scheduleId) {
+      alert("錯誤：缺少課程資訊，請從課程頁面重新進入");
+      return;
+    }
+
+    try {
+      const payload = {
+        title: formData.title,
+        description: formData.content,
+        remind_date: formData.date,
+        remind_at: formData.time || null,
+        schedule_id: scheduleId // 必定有值，從課程頁面傳入
+      };
+
+      console.log("發送提醒資料：", payload); // 除錯用
+
+      const response = await axios.post("http://localhost:3000/reminder", payload, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+
+      if (response.data.success) {
+        alert("提醒建立成功！");
+        
+        // 清空表單
+        setFormData({
+          title: "",
+          content: "",
+          date: "",
+          time: ""
+        });
+        
+        // 關閉彈窗
+        if (onClose) onClose();
+      }
+    } catch (err) {
+      console.error("建立提醒失敗:", err);
+      
+      // 解析後端錯誤訊息
+      const errorMessage = err.response?.data?.message || "建立提醒失敗，請稍後再試";
+      alert(errorMessage);
+    }
   };
  
   return (
@@ -51,7 +81,14 @@ function Reminder({ onClose }) {
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-3">
               <FaBell className="text-2xl" />
-              <h2 className="text-2xl font-bold">新增提醒事項</h2>
+              <div>
+                <h2 className="text-2xl font-bold">新增提醒事項</h2>
+                {courseName && (
+                  <p className="text-orange-100 text-sm mt-1">
+                    關聯課程: {courseName}
+                  </p>
+                )}
+              </div>
             </div>
             <button 
               onClick={onClose}
@@ -149,4 +186,4 @@ function Reminder({ onClose }) {
   );
 }
 
-export default Reminder;
+export default AddReminder;
