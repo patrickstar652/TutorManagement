@@ -1,36 +1,38 @@
 import Navbar from "../component/Navbar";
+import Carousel from "../component/Carousel";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from 'jwt-decode';
 
 function Home() {
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
 
-  // const checkAuth = () => {
-  //   try {
-  //     const token = localStorage.getItem('token');
-  //     if (!token) return false;
+  const checkAuth = () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return false;
 
-  //     const decodedToken = jwtDecode(token);
-  //     const currentTime = Date.now() / 1000;
+      const decodedToken = jwtDecode(token);
+      const currentTime = Date.now() / 1000;
       
-  //     if (decodedToken.exp < currentTime) {
-  //       localStorage.removeItem('token');
-  //       return false;
-  //     }
-  //     return true;
-  //   } catch (error) {
-  //     localStorage.removeItem('token');
-  //     return false;
-  //   }
-  // };
+      if (decodedToken.exp < currentTime) {
+        localStorage.removeItem('token');
+        return false;
+      }
+      return true;
+    } catch {
+      localStorage.removeItem('token');
+      return false;
+    }
+  };
 
-  // const handleStartUsing = () => {
-  //   if (checkAuth()) {
-  //     navigate('/course');
-  //   } else {
-  //     navigate('/login');
-  //   }
-  // };
+  const handleStartUsing = () => {
+    if (checkAuth()) {
+      navigate('/course');
+    } else {
+      navigate('/login');
+    }
+  };
+
   return (
     <div className="scroll-smooth">
       {/* 固定在最上方的導覽列 */}
@@ -50,14 +52,14 @@ function Home() {
           <div className="text-center px-6 max-w-4xl ">
             <div className="relative inline-block mb-6 p-8">
               {/* 標題背景遮罩 */}
-              {/* <div className="absolute inset-0 bg-white opacity-80 rounded-2xl "></div> */}
-              {/* <h1 className="relative text-6xl font-bold bg-gradient-to-r from-blue-800 via-blue-400 to-blue-800 bg-clip-text text-transparent">
+              <div className="absolute inset-0 bg-white opacity-80 rounded-2xl "></div>
+              <h1 className="relative text-6xl font-bold bg-gradient-to-r from-blue-800 via-blue-400 to-blue-800 bg-clip-text text-transparent">
                 座位管理系統
-              </h1> */}
+              </h1>
             </div>
-            {/* <p className="text-xl mb-8 text-gray-200 leading-relaxed">
+            <p className="text-xl mb-8 text-gray-200 leading-relaxed">
               專為教育機構設計的智能座位管理解決方案，讓課程管理變得更加簡單高效
-            </p> */}
+            </p>
             
             {/* 功能特色 */}
             <div className="grid md:grid-cols-3 gap-8 mb-12">
@@ -83,7 +85,7 @@ function Home() {
             {/* 操作按鈕 */}
             <div className="space-x-4 mb-8">
               <button 
-                // onClick={handleStartUsing}
+                onClick={handleStartUsing}
                 className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
               >
                 開始使用
@@ -111,6 +113,9 @@ function Home() {
           <p className="text-xl text-gray-600 leading-relaxed mb-8">
             我們正在不斷改進和添加新功能，為您提供更好的使用體驗
           </p>
+
+          {/* Carousel 組件 */}
+          <Carousel />
           
           {/* 添加更多內容 */}
           <div className="grid md:grid-cols-2 gap-8 mt-12">
