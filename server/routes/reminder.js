@@ -100,15 +100,31 @@ router.post("/reminder", async (req, res) => {
 });
 
 router.get("/reminder", async (req, res) => {
+  const { scheduleId } = req.query;
+  
   try {
-    const result = await pool.query(
-      `SELECT r.*, s.course_name 
-       FROM reminders r 
-       LEFT JOIN schedule s ON r.schedule_id = s.id 
-       WHERE r.user_id = $1 
-       ORDER BY r.remind_date, r.remind_at`,
-      [req.user.id]
-    );
+    let query;
+    let params;
+    
+    if (scheduleId) {
+      // 如果有指定 scheduleId，只取該課程的提醒
+      query = `SELECT r.*, s.course_name 
+               FROM reminders r 
+               LEFT JOIN schedule s ON r.schedule_id = s.id 
+               WHERE r.user_id = $1 AND r.schedule_id = $2 
+               ORDER BY r.remind_date, r.remind_at`;
+      params = [req.user.id, scheduleId];
+    } else {
+      // 如果沒有指定 scheduleId，取該使用者的所有提醒
+      query = `SELECT r.*, s.course_name 
+               FROM reminders r 
+               LEFT JOIN schedule s ON r.schedule_id = s.id 
+               WHERE r.user_id = $1 
+               ORDER BY r.remind_date, r.remind_at`;
+      params = [req.user.id];
+    }
+    
+    const result = await pool.query(query, params);
     
     res.status(200).json({
       success: true,

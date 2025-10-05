@@ -16,8 +16,9 @@ function Reminder() {
     setLoading(true);
     setErr("");
     try {
+      const params = scheduleId ? { scheduleId } : {};
       const res = await axios.get("http://localhost:3000/reminder", {
-        params: { scheduleId },
+        params,
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       const data = res.data.success ? res.data.data : [];
@@ -41,8 +42,8 @@ function Reminder() {
   useEffect(() => {
     const onKey = (e) => {
       if (isOpen) return;
-      if (e.key === "ArrowLeft") prev();
-      if (e.key === "ArrowRight") next();
+      if (e.key === "ArrowLeft") setIndex((i) => (i - 1 + reminders.length) % reminders.length);
+      if (e.key === "ArrowRight") setIndex((i) => (i + 1) % reminders.length);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -138,7 +139,7 @@ function Reminder() {
               </div>
 
               <div className="mb-1 text-sm text-slate-500">
-                {fmt.date(current?.remind_at)}　{fmt.time(current?.remind_at)}
+                {fmt.date(current?.remind_at)} {fmt.time(current?.remind_at)}
               </div>
 
               <div className="line-clamp-2 text-slate-600">
@@ -199,7 +200,7 @@ function Reminder() {
                   </span>
                 ) : null}
                 <span className="text-sm">
-                  🗓 {fmt.date(current.remind_at)}　🕒 {fmt.time(current.remind_at)}
+                  \ud83d\udcc5 {fmt.date(current.remind_at)} \ud83d\udd52 {fmt.time(current.remind_at)}
                 </span>
               </div>
 

@@ -59,7 +59,7 @@ function Sidebar() {
 						}`}
 					>
 						<FaCalendarAlt className={`text-lg mb-1 ${showPayment ? "text-white" : "group-hover:text-orange-600"}`} />
-						<span className="text-xs font-medium whitespace-nowrap">繳費狀態</span>
+						<span className="text-xs font-medium whitespace-nowrap">繳費資訊</span>
 					</button>
 				</nav>
 			</div>
@@ -76,7 +76,7 @@ function Sidebar() {
 				<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-30">
 					<div className="bg-white p-6 rounded-lg shadow-xl max-w-md w-full mx-4">
 						<div className="flex justify-between items-center mb-4">
-							<h2 className="text-xl font-bold text-gray-800">繳費狀態</h2>
+							<h2 className="text-xl font-bold text-gray-800">繳費內容</h2>
 							<button 
 								onClick={() => setShowPayment(false)}
 								className="text-gray-500 hover:text-gray-700 text-xl"

@@ -25,6 +25,19 @@ const loggerMiddleware = (req, res, next) => {
   next();
 };
 
+router.post("/payment", async (req, res) => {
+  const { name, status, paytime } = req.body;
+  try {
+    const result = await pool.query(
+      "INSERT INTO payments (user_id, schedule_id, name, status, paytime) VALUES ($1, $2, $3, $4, $5) RETURNING id",
+      [req.user.id, scheduleId, name, status, paytime]
+    );
+    res.status(200).json({ message: "付款成功" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "付款失敗" });
+  }
+});
 router.use(loggerMiddleware);
 
 module.exports = router;

@@ -2,9 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 
 function Carousel() {
   const slides = [
-    '/background.jpg',
-    'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?q=80&w=1600&auto=format&fit=crop&ixlib=rb-4.0.3&s=1d2f4f8e7f4b9a9e',
-    'https://images.unsplash.com/photo-1508830524289-0adcbe822b40?q=80&w=1600&auto=format&fit=crop&ixlib=rb-4.0.3&s=4b7f5a1d3a2f6c7b'
+    '/教室展示1.jpg',  
+    '/教室展示2.jpg',
   ];
 
   const [index, setIndex] = useState(0);
@@ -49,12 +48,12 @@ function Carousel() {
 
       <div className="absolute inset-0 bg-black/20" />
 
-      <div className="relative z-20 h-full flex items-center justify-center">
+      {/* <div className="relative z-20 h-full flex items-center justify-center">
         <div className="text-center px-6 text-white">
           <h3 className="text-2xl md:text-3xl font-bold mb-2">圖片輪播展示</h3>
           <p className="text-sm md:text-base">使用左右鍵或按鈕切換圖片</p>
         </div>
-      </div>
+      </div> */}
 
       {/* controls */}
       <button 
