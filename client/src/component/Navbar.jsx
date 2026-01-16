@@ -1,6 +1,7 @@
 import { Link, useLocation, NavLink } from "react-router-dom";
 import { FaBook, FaSun, FaMoon } from "react-icons/fa";
 import { IoLogOutOutline } from "react-icons/io5";
+import { School, CalendarCheck } from 'lucide-react'
 import { useNavigate } from "react-router-dom";
 import Logout from "../pages/Logout";
 import * as jwt_decode from "jwt-decode";
@@ -56,14 +57,14 @@ function Navbar() {
             <>
               <NavLink className={getLinkColor} to={"/class"}>
                 <div className="flex items-center gap-1">
-                  <IoLogOutOutline className="text-2xl" />
+                  <School className="text-2xl" />
                   <span>班級</span>
                 </div>
               </NavLink>
               
               <NavLink className={getLinkColor} to={"/course"}>
                 <div className="flex items-center gap-1">
-                  <IoLogOutOutline className="text-2xl" />
+                  <CalendarCheck className="text-2xl" />
                   <span>課表</span>
                 </div>
               </NavLink>

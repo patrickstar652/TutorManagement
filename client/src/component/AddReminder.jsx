@@ -1,6 +1,14 @@
 import { useState } from "react";
 import axios from "axios";
-import { FaBell, FaCalendarAlt, FaClock, FaStickyNote } from "react-icons/fa";
+import {
+  FaBell,
+  FaCalendarAlt,
+  FaClock,
+  FaStickyNote,
+  FaTimes,
+  FaCheck,
+  FaArrowRight,
+} from "react-icons/fa";
 
 function AddReminder({ onClose, scheduleId, courseName }) {
   const [formData, setFormData] = useState({
@@ -10,28 +18,31 @@ function AddReminder({ onClose, scheduleId, courseName }) {
     time: "",
   });
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [activeField, setActiveField] = useState("");
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // 驗證必要欄位
+
     if (!formData.title || !formData.date) {
       alert("請填寫標題和日期");
       return;
     }
 
-    // 確保有 scheduleId（從課程頁面傳入）
     if (!scheduleId) {
       alert("錯誤：缺少課程資訊，請從課程頁面重新進入");
       return;
     }
+
+    setIsSubmitting(true);
 
     try {
       const payload = {
@@ -39,148 +50,241 @@ function AddReminder({ onClose, scheduleId, courseName }) {
         description: formData.content,
         remind_date: formData.date,
         remind_at: formData.time || null,
-        schedule_id: scheduleId // 必定有值，從課程頁面傳入
+        schedule_id: scheduleId,
       };
 
-      console.log("發送提醒資料：", payload); // 除錯用
-
-      const response = await axios.post("http://localhost:3000/reminder", payload, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`
+      const response = await axios.post(
+        "http://localhost:3000/reminder",
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
         }
-      });
+      );
 
       if (response.data.success) {
-        alert("提醒建立成功！");
-        
-        // 清空表單
         setFormData({
           title: "",
           content: "",
           date: "",
-          time: ""
+          time: "",
         });
-        
-        // 關閉彈窗
+
         if (onClose) onClose();
       }
     } catch (err) {
       console.error("建立提醒失敗:", err);
-      
-      // 解析後端錯誤訊息
-      const errorMessage = err.response?.data?.message || "建立提醒失敗，請稍後再試";
+      const errorMessage =
+        err.response?.data?.message || "建立提醒失敗，請稍後再試";
       alert(errorMessage);
+    } finally {
+      setIsSubmitting(false);
     }
   };
- 
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-30 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
-        {/* 標題區域 */}
-        <div className="bg-gradient-to-r from-orange-500 to-orange-400 text-white p-6 rounded-t-2xl">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center gap-3">
-              <FaBell className="text-2xl" />
-              <div>
-                <h2 className="text-2xl font-bold">新增提醒事項</h2>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      {/* Backdrop with blur and darken */}
+      <div
+        className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity duration-300"
+        onClick={onClose}
+      ></div>
+
+      <style>
+        {`
+          @keyframes slideUpFade {
+            from { opacity: 0; transform: translateY(20px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+          }
+          .animate-slide-up {
+            animation: slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          }
+        `}
+      </style>
+
+      {/* Main Card */}
+      <div className="relative w-full max-w-lg bg-white rounded-[2rem] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.15)] overflow-hidden animate-slide-up border border-white/40 ring-1 ring-black/5">
+        {/* Subtle decorative background gradient */}
+        <div className="absolute -top-20 -right-20 w-64 h-64 bg-orange-100 rounded-full blur-3xl opacity-60 pointer-events-none"></div>
+        <div className="absolute top-10 -left-20 w-64 h-64 bg-rose-50 rounded-full blur-3xl opacity-60 pointer-events-none"></div>
+
+        {/* Content */}
+        <div className="relative px-8 pt-8 pb-8">
+          {/* Header */}
+          <div className="flex justify-between items-start mb-8">
+            <div className="flex items-center gap-4">
+              <div className="flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-br from-orange-50 to-orange-100 text-orange-500 shadow-sm border border-orange-100/50">
+                <FaBell className="text-xl" />
+              </div>
+              <div className="flex flex-col">
+                <h2 className="text-2xl font-extrabold text-slate-800 tracking-tight">
+                  新增提醒
+                </h2>
                 {courseName && (
-                  <p className="text-orange-100 text-sm mt-1">
-                    關聯課程: {courseName}
-                  </p>
+                  <div className="flex items-center gap-1.5 mt-0.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-orange-400"></span>
+                    <span className="text-sm font-medium text-slate-500">
+                      {courseName}
+                    </span>
+                  </div>
                 )}
               </div>
             </div>
-            <button 
+            <button
               onClick={onClose}
-              className="text-white hover:text-orange-200 transition-colors text-2xl font-bold"
+              className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-all duration-200"
             >
-              ✕
+              <FaTimes className="text-lg" />
             </button>
           </div>
-        </div>
 
-        {/* 表單內容 */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
-          {/* 標題輸入 */}
-          <div className="space-y-2">
-            <label className="block text-sm font-semibold text-gray-700">
-              提醒標題 *
-            </label>
-            <input
-              type="text"
-              name="title"
-              value={formData.title}
-              onChange={handleInputChange}
-              placeholder="請輸入提醒標題..."
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300 bg-gray-50 hover:bg-white"
-              required
-            />
-          </div>
-
-          {/* 內容輸入 */}
-          <div className="space-y-2">
-            <label className="block text-sm font-semibold text-gray-700">
-              <FaStickyNote className="inline mr-2" />
-              提醒內容
-            </label>
-            <textarea
-              name="content"
-              value={formData.content}
-              onChange={handleInputChange}
-              placeholder="請輸入詳細內容..."
-              rows="4"
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300 bg-gray-50 hover:bg-white resize-none"
-            />
-          </div>
-
-          {/* 日期和時間 */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <label className="block text-sm font-semibold text-gray-700">
-                <FaCalendarAlt className="inline mr-2" />
-                日期 *
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Title Input */}
+            <div
+              className={`transition-all duration-200 ${
+                activeField === "title" ? "scale-[1.01]" : ""
+              }`}
+            >
+              <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 ml-1">
+                提醒標題
               </label>
               <input
-                type="date"
-                name="date"
-                value={formData.date}
+                type="text"
+                name="title"
+                value={formData.title}
                 onChange={handleInputChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300 bg-gray-50 hover:bg-white"
+                onFocus={() => setActiveField("title")}
+                onBlur={() => setActiveField("")}
+                placeholder="例如：期中考複習、作業繳交"
+                className="w-full px-5 py-4 bg-slate-50 border-0 rounded-2xl text-slate-700 font-semibold placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-orange-500/20 transition-all duration-200 outline-none"
                 required
               />
             </div>
-            <div className="space-y-2">
-              <label className="block text-sm font-semibold text-gray-700">
-                <FaClock className="inline mr-2" />
-                時間
+
+            {/* Content Textarea */}
+            <div
+              className={`transition-all duration-200 ${
+                activeField === "content" ? "scale-[1.01]" : ""
+              }`}
+            >
+              <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 ml-1">
+                詳細內容{" "}
+                <span className="text-slate-300 font-normal normal-case tracking-normal ml-1">
+                  (選填)
+                </span>
               </label>
-              <input
-                type="time"
-                name="time"
-                value={formData.time}
+              <textarea
+                name="content"
+                value={formData.content}
                 onChange={handleInputChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300 bg-gray-50 hover:bg-white"
+                onFocus={() => setActiveField("content")}
+                onBlur={() => setActiveField("")}
+                placeholder="輸入更多細節..."
+                rows="3"
+                className="w-full px-5 py-4 bg-slate-50 border-0 rounded-2xl text-slate-700 font-medium placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-orange-500/20 transition-all duration-200 outline-none resize-none"
               />
             </div>
-          </div>
 
-          {/* 按鈕區域 */}
-          <div className="flex gap-3 pt-4">
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex-1 px-6 py-3 bg-gray-100 text-gray-700 font-semibold rounded-xl hover:bg-gray-200 transition-all duration-300 transform hover:scale-105"
-            >
-              取消
-            </button>
-            <button
-              type="submit"
-              className="flex-1 px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-400 text-white font-semibold rounded-xl hover:from-orange-600 hover:to-orange-500 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
-            >
-              建立提醒
-            </button>
-          </div>
-        </form>
+            {/* Date & Time Grid */}
+            <div className="grid grid-cols-2 gap-4">
+              <div
+                className={`transition-all duration-200 ${
+                  activeField === "date" ? "scale-[1.01]" : ""
+                }`}
+              >
+                <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 ml-1">
+                  日期
+                </label>
+                <div className="relative">
+                  <input
+                    type="date"
+                    name="date"
+                    value={formData.date}
+                    onChange={handleInputChange}
+                    onFocus={() => setActiveField("date")}
+                    onBlur={() => setActiveField("")}
+                    className="w-full px-5 py-3.5 pl-11 bg-slate-50 border-0 rounded-2xl text-slate-700 font-semibold focus:bg-white focus:ring-2 focus:ring-orange-500/20 transition-all duration-200 outline-none appearance-none"
+                    required
+                  />
+                  <FaCalendarAlt className="absolute left-4 top-1/2 -translate-y-1/2 text-orange-400 pointer-events-none" />
+                </div>
+              </div>
+              <div
+                className={`transition-all duration-200 ${
+                  activeField === "time" ? "scale-[1.01]" : ""
+                }`}
+              >
+                <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 ml-1">
+                  時間
+                </label>
+                <div className="relative">
+                  <input
+                    type="time"
+                    name="time"
+                    value={formData.time}
+                    onChange={handleInputChange}
+                    onFocus={() => setActiveField("time")}
+                    onBlur={() => setActiveField("")}
+                    className="w-full px-5 py-3.5 pl-11 bg-slate-50 border-0 rounded-2xl text-slate-700 font-semibold focus:bg-white focus:ring-2 focus:ring-orange-500/20 transition-all duration-200 outline-none appearance-none"
+                  />
+                  <FaClock className="absolute left-4 top-1/2 -translate-y-1/2 text-orange-400 pointer-events-none" />
+                </div>
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="flex items-center gap-4 pt-6">
+              <button
+                type="button"
+                onClick={onClose}
+                className="px-6 py-3.5 text-slate-500 font-bold hover:bg-slate-50 rounded-xl transition-colors duration-200"
+              >
+                取消
+              </button>
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="flex-1 group relative px-8 py-4 bg-slate-900 text-white font-bold rounded-2xl hover:shadow-lg hover:shadow-orange-500/25 hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed overflow-hidden"
+              >
+                {/* Gradient overlay on hover */}
+                <div className="absolute inset-0 bg-gradient-to-r from-orange-500 to-orange-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+
+                <span className="relative flex items-center justify-center gap-2">
+                  {isSubmitting ? (
+                    <>
+                      <svg
+                        className="animate-spin h-5 w-5 text-white"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                          fill="none"
+                        />
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        />
+                      </svg>
+                      <span>處理中...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>建立提醒</span>
+                      <FaArrowRight className="group-hover:translate-x-1 transition-transform duration-200" />
+                    </>
+                  )}
+                </span>
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   );
