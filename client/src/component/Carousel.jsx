@@ -2,8 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 
 function Carousel() {
   const slides = [
-    '/教室展示1.jpg',  
-    '/教室展示2.jpg',
+    '/picture/教室展示1.jpg',  
+    '/picture/教室展示2.jpg',
   ];
 
   const [index, setIndex] = useState(0);
