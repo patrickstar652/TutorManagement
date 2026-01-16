@@ -2,6 +2,7 @@ import Navbar from "../component/Navbar";
 import Carousel from "../component/Carousel";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
+import { FaFacebook, FaInstagram, FaLine } from "react-icons/fa";
 
 function Home() {
   const navigate = useNavigate();
@@ -43,20 +44,116 @@ function Home() {
       {/* Hero Section - 幾何與線條風格 */}
       <div className="min-h-screen relative flex items-center justify-center overflow-hidden pt-20">
         {/* 背景裝飾 - 幾何圖形與網格 */}
-        <div className="absolute inset-0 pointer-events-none">
-          {/* 右上角圓形裝飾 */}
-          <div className="absolute top-20 right-[-100px] w-96 h-96 border border-gray-100 rounded-full opacity-60"></div>
-          <div className="absolute top-40 right-[-50px] w-64 h-64 bg-blue-50 rounded-full opacity-40"></div>
+        {/* 背景裝飾 - React 概念線條與科技幾何 */}
+        {/* 背景裝飾 - 抽象科技線條 */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          {/* 右上角：抽象連結網絡圖 */}
+          <div className="absolute -top-[5%] -right-[5%] w-[700px] h-[700px] opacity-20">
+            <svg viewBox="0 0 400 400" className="w-full h-full text-blue-600">
+              <defs>
+                <linearGradient
+                  id="lineGrad"
+                  x1="0%"
+                  y1="0%"
+                  x2="100%"
+                  y2="100%"
+                >
+                  <stop offset="0%" stopColor="#2563EB" stopOpacity="0.2" />
+                  <stop offset="100%" stopColor="#4F46E5" stopOpacity="0.8" />
+                </linearGradient>
+              </defs>
 
-          {/* 左下角方塊裝飾 */}
-          <div className="absolute bottom-20 left-10 w-32 h-32 bg-indigo-50 transform rotate-12"></div>
-          <div className="absolute bottom-40 left-20 w-16 h-16 border-2 border-blue-100 transform -rotate-12"></div>
+              {/* 外圈裝飾環 */}
+              <circle
+                cx="200"
+                cy="200"
+                r="150"
+                stroke="url(#lineGrad)"
+                strokeWidth="1.5"
+                fill="none"
+                strokeDasharray="10 10"
+                className="animate-[spin_60s_linear_infinite]"
+              />
+              <circle
+                cx="200"
+                cy="200"
+                r="120"
+                stroke="#2563EB"
+                strokeWidth="0.5"
+                fill="none"
+                opacity="0.5"
+              />
 
-          {/* 網格線條 */}
-          <div className="absolute top-1/4 left-0 w-full h-px bg-gray-50"></div>
-          <div className="absolute top-3/4 left-0 w-full h-px bg-gray-50"></div>
-          <div className="absolute top-0 left-1/4 h-full w-px bg-gray-50"></div>
-          <div className="absolute top-0 right-1/4 h-full w-px bg-gray-50"></div>
+              {/* 核心連結線條 */}
+              <g stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                <path d="M200 200 L320 120" opacity="0.6" />
+                <path d="M200 200 L80 150" opacity="0.4" />
+                <path d="M200 200 L250 320" opacity="0.5" />
+
+                {/* 節點 */}
+                <circle cx="200" cy="200" r="6" fill="#1E40AF" />
+                <circle cx="320" cy="120" r="4" fill="#3B82F6" />
+                <circle cx="80" cy="150" r="4" fill="#3B82F6" />
+                <circle cx="250" cy="320" r="4" fill="#3B82F6" />
+              </g>
+
+              {/* 浮動粒子 */}
+              <circle
+                cx="150"
+                cy="100"
+                r="2"
+                fill="#6366F1"
+                className="animate-pulse"
+              />
+              <circle
+                cx="300"
+                cy="250"
+                r="3"
+                fill="#6366F1"
+                className="animate-pulse"
+                style={{ animationDelay: "1s" }}
+              />
+            </svg>
+          </div>
+
+          {/* 左下角：粗獷的幾何結構 */}
+          <div className="absolute bottom-0 left-0 w-[500px] h-[400px] opacity-15">
+            <svg viewBox="0 0 500 400" className="w-full h-full">
+              <path
+                d="M0 400 L150 250 L350 250 L500 100"
+                stroke="#1E3A8A"
+                strokeWidth="3"
+                fill="none"
+              />
+              <path
+                d="M50 400 L180 270"
+                stroke="#2563EB"
+                strokeWidth="2"
+                fill="none"
+                strokeDasharray="5 5"
+              />
+
+              {/* 裝飾方塊 */}
+              <rect
+                x="140"
+                y="240"
+                width="20"
+                height="20"
+                fill="#1E40AF"
+                transform="rotate(45 150 250)"
+              />
+              <rect
+                x="340"
+                y="240"
+                width="20"
+                height="20"
+                fill="none"
+                stroke="#1E40AF"
+                strokeWidth="2"
+                transform="rotate(45 350 250)"
+              />
+            </svg>
+          </div>
         </div>
 
         <div className="relative z-10 max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-center">
@@ -220,9 +317,147 @@ function Home() {
         </div>
       </div>
 
-      <footer className="bg-gray-50 py-12 border-t border-gray-200">
-        <div className="max-w-6xl mx-auto px-6 text-center text-gray-400">
-          <p>© 2024 座位管理系統. All rights reserved.</p>
+      <footer className="bg-white text-gray-600 py-16 border-t border-gray-100">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="grid md:grid-cols-4 gap-12 mb-12">
+            {/* 品牌區塊 */}
+            <div className="col-span-1 md:col-span-2 space-y-4">
+              <h3 className="text-2xl font-bold text-gray-900 tracking-wide">
+                炫揚文理
+              </h3>
+              <p className="text-gray-500 leading-relaxed max-w-sm">
+                致力於提供最優質的教育環境與智能化的管理系統。讓學習更有效率，讓管理更加輕鬆。
+              </p>
+              <div className="flex gap-4 pt-2">
+                {/* 社群圖標 */}
+                <a
+                  href="#"
+                  className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all cursor-pointer text-gray-600"
+                >
+                  <FaFacebook size={20} />
+                </a>
+                <a
+                  href="https://www.instagram.com/kuosung2019?igsh=MW8wZ3ZrN281Z3VnOQ=="
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center hover:bg-pink-600 hover:text-white transition-all cursor-pointer text-gray-600"
+                >
+                  <FaInstagram size={20} />
+                </a>
+                <a
+                  href="#"
+                  className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center hover:bg-green-500 hover:text-white transition-all cursor-pointer text-gray-600"
+                >
+                  <FaLine size={20} />
+                </a>
+              </div>
+            </div>
+
+            {/* 快速連結 */}
+            <div className="space-y-4">
+              <h4 className="text-lg font-semibold text-gray-900">快速連結</h4>
+              <ul className="space-y-2">
+                <li>
+                  <a href="#" className="hover:text-blue-600 transition-colors">
+                    關於我們
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-blue-600 transition-colors">
+                    課程介紹
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-blue-600 transition-colors">
+                    師資團隊
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-blue-600 transition-colors">
+                    最新消息
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            {/* 聯絡資訊 */}
+            <div className="space-y-4">
+              <h4 className="text-lg font-semibold text-gray-900">聯絡我們</h4>
+              <ul className="space-y-3 text-gray-500">
+                <li className="flex items-start gap-3">
+                  <svg
+                    className="w-5 h-5 mt-1 shrink-0 text-blue-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                  </svg>
+                  <span className="whitespace-nowrap">
+                    台北市文山區羅斯福路171號7樓
+                  </span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <svg
+                    className="w-5 h-5 shrink-0 text-blue-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                    />
+                  </svg>
+                  <span>(02) 2933-4567</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <svg
+                    className="w-5 h-5 shrink-0 text-blue-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                    />
+                  </svg>
+                  <span>contact@demo.com</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="border-t border-gray-100 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-500">
+            <p>© {new Date().getFullYear()} 炫揚文理. All rights reserved.</p>
+            <div className="flex gap-6">
+              <a href="#" className="hover:text-blue-600 transition-colors">
+                隱私權政策
+              </a>
+              <a href="#" className="hover:text-blue-600 transition-colors">
+                服務條款
+              </a>
+              <a href="#" className="hover:text-blue-600 transition-colors">
+                使用規範
+              </a>
+            </div>
+          </div>
         </div>
       </footer>
     </div>
