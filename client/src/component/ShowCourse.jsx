@@ -103,14 +103,14 @@ function ShowCourse() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="bg-white rounded-xl shadow-lg overflow-visible">
-        <table className="w-full border-collapse">
-          <thead className="bg-gradient-to-r from-orange-400 to-orange-500 text-white">
+    <div className="tm-shell pb-12">
+      <div className="tm-panel overflow-x-auto p-2">
+        <table className="w-full min-w-[980px] border-separate border-spacing-0">
+          <thead>
             <tr>
-              <th className="py-4 px-6 text-left font-semibold">時間</th>
+              <th className="tm-table-head rounded-l-2xl px-5 py-4 text-left text-sm font-extrabold">時間</th>
               {Object.values(weekdayMap).map((day, i) => (
-                <th key={i} className="py-4 px-6 text-center font-semibold">
+                <th key={i} className={`tm-table-head px-5 py-4 text-center text-sm font-extrabold ${i === Object.values(weekdayMap).length - 1 ? "rounded-r-2xl" : ""}`}>
                   {day}
                 </th>
               ))}
@@ -118,20 +118,20 @@ function ShowCourse() {
           </thead>
           <tbody>
             {timeSlots.map((slot, i) => (
-              <tr key={i} className="border-b border-gray-200 transition-colors">
-                <td className="py-4 px-6 bg-gray-50 font-medium">{slot}</td>
+              <tr key={i} className="transition-colors">
+                <td className="border-b border-slate-200 bg-slate-50 px-5 py-4 text-sm font-bold text-[#12345c] first:rounded-l-2xl">{slot}</td>
                 {Object.keys(weekdayMap).map((day) => (
                   <td
                     key={day}
-                    className={`py-4 px-6 text-center whitespace-pre-line relative group ${
+                    className={`relative border-b border-slate-200 px-4 py-3 text-center align-middle whitespace-pre-line group ${
                       courseTable[slot] && courseTable[slot][day]
-                        ? "bg-amber-100 font-bold text-amber-900"
-                        : ""
+                        ? "bg-yellow-50/80 font-bold text-slate-900"
+                        : "bg-white text-slate-400"
                     }`}
                   >
                     {courseTable[slot] && courseTable[slot][day] ? (
                       <>
-                        <div>{courseTable[slot][day]?.courseName}</div>
+                        <div className="mx-auto rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm font-extrabold text-[#12345c] shadow-sm">{courseTable[slot][day]?.courseName}</div>
                         <div
                           className="absolute top-full left-1/2 transform -translate-x-1/2 mt-1
                                       opacity-0 group-hover:opacity-100 
@@ -143,7 +143,7 @@ function ShowCourse() {
                                       pb-2"
                         >
                           <div
-                            className="bg-white rounded-lg shadow-xl border border-gray-200 p-3 min-w-[120px]
+                            className="min-w-[120px] rounded-2xl border border-slate-200 bg-white p-3 shadow-xl
                                         before:absolute before:top-[-6px] before:left-1/2 before:transform before:-translate-x-1/2
                                         before:w-0 before:h-0 before:border-l-[6px] before:border-r-[6px] before:border-b-[6px]
                                         before:border-l-transparent before:border-r-transparent before:border-b-white
@@ -151,8 +151,8 @@ function ShowCourse() {
                                         hover:shadow-2xl transition-shadow duration-300"
                           >
                             <button
-                              className="w-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 
-                                       text-white text-sm font-medium px-4 py-2.5 rounded-lg 
+                              className="w-full bg-red-600 hover:bg-red-700 
+                                       text-white text-sm font-bold px-4 py-2.5 rounded-xl
                                        transition-all duration-200 ease-out
                                        hover:scale-105 hover:shadow-lg hover:shadow-red-500/40
                                        active:scale-95

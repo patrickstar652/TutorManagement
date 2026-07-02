@@ -105,16 +105,16 @@ function AddReminder({ onClose, scheduleId, courseName }) {
 
       {/* Main Card */}
       <div className="relative w-full max-w-lg bg-white rounded-[2rem] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.15)] overflow-hidden animate-slide-up border border-white/40 ring-1 ring-black/5">
-        {/* Subtle decorative background gradient */}
-        <div className="absolute -top-20 -right-20 w-64 h-64 bg-orange-100 rounded-full blur-3xl opacity-60 pointer-events-none"></div>
-        <div className="absolute top-10 -left-20 w-64 h-64 bg-rose-50 rounded-full blur-3xl opacity-60 pointer-events-none"></div>
+        {/* Subtle decorative background accents */}
+        <div className="absolute -top-20 -right-20 w-64 h-64 bg-slate-100 rounded-full blur-3xl opacity-70 pointer-events-none"></div>
+        <div className="absolute top-10 -left-20 w-64 h-64 bg-yellow-50 rounded-full blur-3xl opacity-80 pointer-events-none"></div>
 
         {/* Content */}
         <div className="relative px-8 pt-8 pb-8">
           {/* Header */}
           <div className="flex justify-between items-start mb-8">
             <div className="flex items-center gap-4">
-              <div className="flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-br from-orange-50 to-orange-100 text-orange-500 shadow-sm border border-orange-100/50">
+              <div className="flex items-center justify-center w-12 h-12 rounded-2xl bg-slate-50 text-[#12345c] shadow-sm border border-slate-200">
                 <FaBell className="text-xl" />
               </div>
               <div className="flex flex-col">
@@ -123,7 +123,7 @@ function AddReminder({ onClose, scheduleId, courseName }) {
                 </h2>
                 {courseName && (
                   <div className="flex items-center gap-1.5 mt-0.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-orange-400"></span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#f97316]"></span>
                     <span className="text-sm font-medium text-slate-500">
                       {courseName}
                     </span>
@@ -157,7 +157,7 @@ function AddReminder({ onClose, scheduleId, courseName }) {
                 onFocus={() => setActiveField("title")}
                 onBlur={() => setActiveField("")}
                 placeholder="例如：期中考複習、作業繳交"
-                className="w-full px-5 py-4 bg-slate-50 border-0 rounded-2xl text-slate-700 font-semibold placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-orange-500/20 transition-all duration-200 outline-none"
+                    className="w-full px-5 py-4 bg-slate-50 border-0 rounded-2xl text-slate-700 font-semibold placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-[#12345c]/20 transition-all duration-200 outline-none"
                 required
               />
             </div>
@@ -182,7 +182,7 @@ function AddReminder({ onClose, scheduleId, courseName }) {
                 onBlur={() => setActiveField("")}
                 placeholder="輸入更多細節..."
                 rows="3"
-                className="w-full px-5 py-4 bg-slate-50 border-0 rounded-2xl text-slate-700 font-medium placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-orange-500/20 transition-all duration-200 outline-none resize-none"
+                className="w-full px-5 py-4 bg-slate-50 border-0 rounded-2xl text-slate-700 font-medium placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-[#12345c]/20 transition-all duration-200 outline-none resize-none"
               />
             </div>
 
@@ -204,10 +204,10 @@ function AddReminder({ onClose, scheduleId, courseName }) {
                     onChange={handleInputChange}
                     onFocus={() => setActiveField("date")}
                     onBlur={() => setActiveField("")}
-                    className="w-full px-5 py-3.5 pl-11 bg-slate-50 border-0 rounded-2xl text-slate-700 font-semibold focus:bg-white focus:ring-2 focus:ring-orange-500/20 transition-all duration-200 outline-none appearance-none"
+                    className="w-full px-5 py-3.5 pl-11 bg-slate-50 border-0 rounded-2xl text-slate-700 font-semibold focus:bg-white focus:ring-2 focus:ring-[#12345c]/20 transition-all duration-200 outline-none appearance-none"
                     required
                   />
-                  <FaCalendarAlt className="absolute left-4 top-1/2 -translate-y-1/2 text-orange-400 pointer-events-none" />
+                  <FaCalendarAlt className="absolute left-4 top-1/2 -translate-y-1/2 text-[#f97316] pointer-events-none" />
                 </div>
               </div>
               <div
@@ -226,9 +226,9 @@ function AddReminder({ onClose, scheduleId, courseName }) {
                     onChange={handleInputChange}
                     onFocus={() => setActiveField("time")}
                     onBlur={() => setActiveField("")}
-                    className="w-full px-5 py-3.5 pl-11 bg-slate-50 border-0 rounded-2xl text-slate-700 font-semibold focus:bg-white focus:ring-2 focus:ring-orange-500/20 transition-all duration-200 outline-none appearance-none"
+                    className="w-full px-5 py-3.5 pl-11 bg-slate-50 border-0 rounded-2xl text-slate-700 font-semibold focus:bg-white focus:ring-2 focus:ring-[#12345c]/20 transition-all duration-200 outline-none appearance-none"
                   />
-                  <FaClock className="absolute left-4 top-1/2 -translate-y-1/2 text-orange-400 pointer-events-none" />
+                  <FaClock className="absolute left-4 top-1/2 -translate-y-1/2 text-[#f97316] pointer-events-none" />
                 </div>
               </div>
             </div>
@@ -245,10 +245,9 @@ function AddReminder({ onClose, scheduleId, courseName }) {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="flex-1 group relative px-8 py-4 bg-slate-900 text-white font-bold rounded-2xl hover:shadow-lg hover:shadow-orange-500/25 hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed overflow-hidden"
+                className="flex-1 group relative px-8 py-4 bg-[#12345c] text-white font-bold rounded-2xl hover:shadow-lg hover:shadow-slate-900/20 hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed overflow-hidden"
               >
-                {/* Gradient overlay on hover */}
-                <div className="absolute inset-0 bg-gradient-to-r from-orange-500 to-orange-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="absolute inset-x-0 bottom-0 h-1 bg-[#38bdf8] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
                 <span className="relative flex items-center justify-center gap-2">
                   {isSubmitting ? (

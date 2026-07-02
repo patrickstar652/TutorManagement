@@ -1,3 +1,6 @@
+const path = require("path");
+require("dotenv").config({ path: path.join(__dirname, ".env") });
+
 // 引入 Express 框架
 const express = require('express');
 // 引入 CORS 中介軟體，處理跨域請求

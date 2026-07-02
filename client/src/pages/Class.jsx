@@ -22,36 +22,43 @@ function Class() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="tm-page">
       <Navbar />
-      <div className="flex-1 flex justify-center">
-        <div className="flex flex-col items-center mt-6 py-6 gap-4 w-full max-w-2xl">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-orange-600 via-orange-500 to-orange-400 bg-clip-text text-transparent mb-2">
+      <div className="tm-shell py-10">
+        <div className="mx-auto flex w-full max-w-3xl flex-col items-center gap-4">
+          <span className="tm-section-kicker">班級總覽</span>
+          <h1 className="tm-section-title">
             查詢班級
           </h1>
-          <div className="h-1.5 w-40 bg-gradient-to-r from-orange-500 to-orange-300 rounded-full mb-4"></div>
+          <div className="tm-title-underline mb-4"></div>
 
-          <div className="w-full bg-yellow-200 rounded-2xl shadow-lg p-6">
-            <ul className="w-full space-y-6">
+          <div className="tm-panel w-full p-4 sm:p-6">
+            <ul className="w-full space-y-4">
               {classes.map((item) => (
                 <li
                   key={item.schedule_id}
-                  className="bg-white rounded-xl shadow-md hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300"
+                  className="tm-card tm-card-hover overflow-hidden"
                 >
                   <Link
-                    className="flex items-center justify-between p-4 font-medium"
+                    className="flex items-center justify-between gap-4 p-5 font-medium"
                     to={`/class/seat/${item.schedule_id}`}  // ✅ 用 schedule_id
                   >
-                    <div className="flex flex-col justify-center py-1 ml-2">
-                      <span className="text-gray-900 text-lg font-bold mb-1">
-                        {item.course_name}                     {/* ✅ 用 course_name */}
-                      </span>
-                      {/* 想顯示時間可用：{item.weekday} {item.start_time?.slice(0,5)}~{item.end_time?.slice(0,5)} */}
+                    <div className="flex items-center gap-4">
+                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-slate-50 text-lg font-extrabold text-[#12345c] ring-1 ring-slate-200">
+                        班
+                      </div>
+                      <div className="flex flex-col justify-center py-1">
+                        <span className="mb-1 text-lg font-extrabold text-slate-900">
+                          {item.course_name}                     {/* ✅ 用 course_name */}
+                        </span>
+                        {/* 想顯示時間可用：{item.weekday} {item.start_time?.slice(0,5)}~{item.end_time?.slice(0,5)} */}
+                        <span className="text-sm font-medium text-slate-500">點選查看座位、提醒與繳費狀態</span>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-yellow-50 text-[#12345c] transition-colors">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5 text-gray-500"
+                        className="h-5 w-5"
                         viewBox="0 0 20 20"
                         fill="currentColor"
                       >

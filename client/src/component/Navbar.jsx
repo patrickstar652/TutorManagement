@@ -39,21 +39,20 @@ function Navbar() {
   // 根據當前路由決定導航連結的顏色
   const getLinkColor = ({ isActive }) => {
     if (isActive) {
-      return "text-orange-600 font-bold"; // 當前頁面 - 橘色，無底線
+      return "inline-flex items-center gap-2 rounded-full bg-[#12345c] px-3.5 py-2 text-sm font-bold text-white shadow-sm border border-[#12345c]"; // 當前頁面 - 橘色，無底線
     }
-    return "text-blue-800 font-bold transition-colors duration-300 relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-orange-500 after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300"; // 其他頁面 - 藍色，hover 只有底線
+    return "inline-flex items-center gap-2 rounded-full px-3.5 py-2 text-sm font-bold text-slate-600 transition-all duration-200 hover:bg-slate-100 hover:text-[#12345c]"; // 其他頁面 - 藍色，hover 只有底線
   };
 
   return (
     <>
-      <nav className="relative text-3xl bg-white text-blue-900 shadow-lg py-3 max-w-[80%] mx-auto rounded-xl">
-        {/* <nav className="relative text-3xl bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg py-3"> */}
+      <nav className="relative mx-auto mt-3 flex w-[min(1180px,calc(100%-2rem))] items-center justify-between rounded-3xl border border-slate-200 bg-white/92 px-4 py-2.5 text-slate-800 shadow-[0_18px_44px_-32px_rgba(15,35,65,0.35)] backdrop-blur-xl md:px-5">
         <Link
           to="/"
-          className="absolute left-6 top-1/2 -translate-y-1/2 flex items-center gap-3"
+          className="flex min-w-0 items-center gap-2.5"
         >
           <svg
-            className="h-12 w-auto"
+            className="h-9 w-auto rounded-2xl border border-slate-200 bg-slate-50"
             viewBox="0 0 600 350"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
@@ -63,19 +62,15 @@ function Navbar() {
               <color id="hair" value="#4a3223" />
               <color id="glasses-gold" value="#e0a800" />
               <color id="glasses-dark" value="#2c3e50" />
-              <color id="suit-blue" value="#1c3f73" />
+              <color id="suit-blue" value="#111111" />
               <color id="tie-red" value="#c0392b" />
               <color id="shirt-white" value="#ffffff" />
               <color id="vest-grey" value="#7f8c8d" />
               <color id="desk-wood" value="#cba27a" />
 
-              <linearGradient id="bgGradient" x1="0" y1="0" x2="0" y2="100%">
-                <stop offset="0%" stopColor="#eef2f7" />
-                <stop offset="100%" stopColor="#dbe4f0" />
-              </linearGradient>
             </defs>
 
-            <rect width="600" height="350" fill="url(#bgGradient)" />
+            <rect width="600" height="350" fill="#f8fafc" />
             <rect
               x="50"
               y="50"
@@ -93,7 +88,7 @@ function Navbar() {
             <g transform="translate(130, 280)">
               <path
                 d="M-85,0 L-75,-120 C-75,-120 -40,-145 0,-145 C40,-145 75,-120 75,-120 L85,0 Z"
-                fill="#1c3f73"
+                fill="#111111"
               />
               <path d="M-30,-145 L0,-110 L30,-145 L0,-135 Z" fill="#ffffff" />
               <path d="M0,-110 L-10,-135 L10,-135 Z" fill="#c0392b" />
@@ -121,7 +116,7 @@ function Navbar() {
                 <path d="M40,-80 L90,-60 L100,-40 L60,-50 Z" fill="#f3d4b7" />
                 <path
                   d="M40,-80 L90,-60"
-                  stroke="#1c3f73"
+                  stroke="#111111"
                   strokeWidth="12"
                   strokeLinecap="round"
                 />
@@ -170,7 +165,7 @@ function Navbar() {
                 fill="#ffffff"
                 opacity="0.5"
               />
-              <rect x="0" y="0" width="75" height="20" fill="#2980b9" />
+              <rect x="0" y="0" width="75" height="20" fill="#111111" />
               <rect
                 x="5"
                 y="5"
@@ -208,53 +203,53 @@ function Navbar() {
               </g>
             </g>
           </svg>
-          <span className="font-semibold text-2xl tracking-wide text-blue-900">
+          <span className="hidden whitespace-nowrap text-lg font-extrabold tracking-wide text-[#0b2545] sm:inline">
             炫揚文理
           </span>
         </Link>
-        <div className="flex justify-center gap-12 max-w-screen-xl mx-auto">
+        <div className="flex flex-1 justify-center gap-1 sm:gap-2">
           {user_info ? (
             <>
               <NavLink className={getLinkColor} to={"/class"}>
-                <div className="flex items-center gap-1">
-                  <School className="text-2xl" />
+                <div className="flex items-center gap-1.5">
+                  <School className="h-4 w-4" />
                   <span>班級</span>
                 </div>
               </NavLink>
 
               <NavLink className={getLinkColor} to={"/course"}>
-                <div className="flex items-center gap-1">
-                  <CalendarCheck className="text-2xl" />
+                <div className="flex items-center gap-1.5">
+                  <CalendarCheck className="h-4 w-4" />
                   <span>課表</span>
                 </div>
               </NavLink>
 
               <Link
-                className="text-blue-800 font-bold transition-colors duration-300 relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-red-500 after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300"
+                className="inline-flex items-center gap-2 rounded-full px-3.5 py-2 text-sm font-bold text-slate-700 transition-all duration-200 hover:bg-red-50 hover:text-red-600"
                 onClick={handleLogout}
               >
                 {/* 調整登出 icon 和文字的排版 */}
-                <div className="flex items-center gap-1">
-                  <IoLogOutOutline className="text-2xl" />
+                <div className="flex items-center gap-1.5">
+                  <IoLogOutOutline className="text-lg" />
                   <span>登出</span>
                 </div>
               </Link>
             </>
           ) : (
             <>
-              <div className="flex items-center gap-1 text-white">
-                <IoLogOutOutline className="text-2xl" />
+              <div className="flex items-center gap-1 text-transparent">
+                <IoLogOutOutline className="text-lg" />
                 <span>課表</span>
               </div>
             </>
           )}
         </div>
-        <div className="absolute right-6 top-1/2 -translate-y-1/2 flex items-center gap-8">
+        <div className="flex items-center gap-2 sm:gap-3">
           {/* 深淺色模式切換按鈕 */}
           <button
             onClick={toggleDarkMode}
-            className={`w-14 h-7 rounded-full p-1 duration-700 ease-in-out flex items-center justify-between px-1 ${
-              isDark ? "bg-gray-700" : "bg-amber-100"
+            className={`relative flex h-7 w-14 items-center justify-between rounded-full px-1 duration-700 ease-in-out ${
+              isDark ? "bg-gray-700" : "bg-slate-100"
             } hover:shadow-md`}
           >
             <FaSun
@@ -267,8 +262,8 @@ function Navbar() {
             <FaMoon
               className={`text-sm z-10 transition-all duration-700 ease-in-out ${
                 isDark
-                  ? "text-blue-200 scale-110"
-                  : "opacity-50 -rotate-90 text-amber-300"
+                  ? "text-yellow-100 scale-110"
+                : "opacity-50 -rotate-90 text-slate-400"
               }`}
             />
             <div
@@ -280,13 +275,13 @@ function Navbar() {
 
           {/* 使用者名稱 */}
           {user_info ? (
-            <span className="flex items-center gap-2 bg-orange-300 px-4 py-1 rounded-full text-lg text-white">
+            <span className="hidden items-center gap-2 rounded-full bg-slate-50 px-3.5 py-2 text-sm font-bold text-[#12345c] ring-1 ring-slate-200 md:flex">
               {user_info.account}
             </span>
           ) : (
             <Link
               to="/login"
-              className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 px-4 py-1 rounded-full text-lg text-white transition-colors"
+              className="tm-primary-btn px-4 py-2 text-sm"
             >
               登入
             </Link>

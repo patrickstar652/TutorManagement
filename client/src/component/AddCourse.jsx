@@ -75,20 +75,20 @@ function AddCourse() {
   return (
     <>
       <div className="min-h-screen bg-stone-50">
-        <div className="popupWindow hidden fixed inset-0 bg-black bg-opacity-50 z-40 flex items-center justify-center">
-          <div className="relative bg-white rounded-xl shadow-2xl w-[30rem] p-8 z-50 animate-fadeIn">
+        <div className="popupWindow hidden fixed inset-0 z-40 flex items-center justify-center bg-slate-900/45 p-4 backdrop-blur-sm">
+          <div className="relative z-50 w-full max-w-[30rem] animate-fadeIn rounded-3xl border border-slate-200 bg-white p-8 shadow-[0_24px_60px_-28px_rgba(15,35,65,0.48)]">
             <form onSubmit={handleForm}>
-              <h3 className="text-xl font-semibold text-gray-800 text-center mb-6">
+              <h3 className="mb-6 text-center text-2xl font-extrabold text-slate-900">
                 加入課表
               </h3>
 
               <div className="flex flex-col space-y-4">
                 {/* 課程名稱 */}
                 <div className="flex flex-col space-y-2">
-                  <label className="text-sm font-medium text-gray-700">課程名稱</label>
+                  <label className="text-sm font-bold text-slate-700">課程名稱</label>
                   <input
                     type="text"
-                    className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                    className="tm-input"
                     placeholder="請輸入課程名稱"
                     value={course_name}
                     onChange={(e) => set_course_name(e.target.value)}
@@ -98,10 +98,10 @@ function AddCourse() {
 
                 {/* 星期幾 */}
                 <div className="flex flex-col space-y-2">
-                  <label className="text-sm font-medium text-gray-700">上課星期</label>
+                  <label className="text-sm font-bold text-slate-700">上課星期</label>
                   <select
                     required
-                    className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                    className="tm-input"
                     value={weekday}
                     onChange={(e) => set_weekday(Number(e.target.value))}
                   >
@@ -118,14 +118,14 @@ function AddCourse() {
 
                 {/* 上課時間 */}
                 <div className="flex flex-col space-y-2">
-                  <label className="text-sm font-medium text-gray-700">上課時間</label>
+                  <label className="text-sm font-bold text-slate-700">上課時間</label>
                   <TimePicker
                     required
                     format="HH:mm"
                     minuteStep={30}
                     onChange={(v) => set_start_time(v)}
                     value={start_time}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                    className="tm-input"
                     disabledTime={() => ({
                       disabledHours: () =>
                         Array.from({ length: 9 }, (_, i) => i).concat(
@@ -139,14 +139,14 @@ function AddCourse() {
 
                 {/* 下課時間 */}
                 <div className="flex flex-col space-y-2">
-                  <label className="text-sm font-medium text-gray-700">下課時間</label>
+                  <label className="text-sm font-bold text-slate-700">下課時間</label>
                   <TimePicker
                     required
                     format="HH:mm"
                     minuteStep={30}
                     onChange={(v) => set_end_time(v)}
                     value={end_time}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                    className="tm-input"
                     disabledTime={() => ({
                       disabledHours: () =>
                         Array.from({ length: 9 }, (_, i) => i).concat(
@@ -162,14 +162,14 @@ function AddCourse() {
               <div className="flex gap-3 mt-6">
                 <button
                   type="submit"
-                  className="flex-1 py-2.5 px-4 bg-orange-400 hover:bg-orange-500 text-white font-medium rounded-lg transition-colors duration-200 shadow-sm"
+                  className="tm-primary-btn flex-1 py-2.5"
                 >
                   確認
                 </button>
                 <button
                   type="button"
                   onClick={close}
-                  className="flex-1 py-2.5 px-4 bg-gray-400 hover:bg-red-600 text-white font-medium rounded-lg transition-colors duration-200 shadow-sm"
+                  className="tm-secondary-btn flex-1 py-2.5"
                 >
                   關閉
                 </button>

@@ -33,7 +33,7 @@ function Carousel() {
   const next = () => setIndex((i) => (i + 1) % slides.length);
 
   return (
-    <div className="relative w-full h-96 mx-auto my-8 overflow-hidden rounded-xl shadow-lg">
+    <div className="relative mx-auto my-8 h-80 w-full overflow-hidden rounded-[1.75rem] border border-slate-200 shadow-[0_20px_48px_-32px_rgba(15,35,65,0.38)] sm:h-96">
       {slides.map((src, i) => (
         <div
           key={i}
@@ -46,7 +46,7 @@ function Carousel() {
         />
       ))}
 
-      <div className="absolute inset-0 bg-black/20" />
+      <div className="absolute inset-0 bg-black/10" />
 
       {/* <div className="relative z-20 h-full flex items-center justify-center">
         <div className="text-center px-6 text-white">
@@ -59,9 +59,9 @@ function Carousel() {
       <button 
         onClick={prev} 
         aria-label="上一張圖片" 
-        className="absolute left-4 top-1/2 z-30 -translate-y-1/2 rounded-full bg-white/30 hover:bg-white/60 p-2 transition-all"
+        className="absolute left-4 top-1/2 z-30 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/55 bg-white/70 text-slate-800 shadow-sm backdrop-blur transition-all hover:bg-white"
       >
-        <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
         </svg>
       </button>
@@ -69,9 +69,9 @@ function Carousel() {
       <button 
         onClick={next} 
         aria-label="下一張圖片" 
-        className="absolute right-4 top-1/2 z-30 -translate-y-1/2 rounded-full bg-white/30 hover:bg-white/60 p-2 transition-all"
+        className="absolute right-4 top-1/2 z-30 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/55 bg-white/70 text-slate-800 shadow-sm backdrop-blur transition-all hover:bg-white"
       >
-        <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
         </svg>
       </button>
@@ -82,7 +82,7 @@ function Carousel() {
           <button 
             key={i} 
             onClick={() => setIndex(i)} 
-            className={`h-2 rounded-full transition-all ${i === index ? 'w-6 bg-white' : 'w-2 bg-white/60'}`} 
+            className={`h-2 rounded-full transition-all ${i === index ? 'w-7 bg-[#f97316]' : 'w-2 bg-white/75'}`}
             aria-label={`切換到第 ${i+1} 張圖片`} 
           />
         ))}

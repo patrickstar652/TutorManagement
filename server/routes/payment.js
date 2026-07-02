@@ -5,15 +5,7 @@ require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const SECRET_KEY = process.env.SECRET_KEY;
 
-const { Pool } = require("pg");
-
-const pool = new Pool({
-  user: process.env.db_user,
-  host: process.env.db_host,
-  database: process.env.db_database,
-  password: process.env.db_password,
-  port: process.env.db_port,
-});
+const pool = require("../db");
 
 const loggerMiddleware = (req, res, next) => {
   const token = req.headers.authorization?.split(" ")[1];

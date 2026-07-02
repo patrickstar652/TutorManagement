@@ -6,19 +6,20 @@ function Course() {
     document.querySelector(".popupWindow").classList.remove("hidden");
   };
   return (
-    <div className="min-h-screen bg-stone-50">
+    <div className="tm-page">
       <Navbar/>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="relative flex flex-col items-center mb-12">
-          <div className="flex flex-col items-center mb-8">
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-orange-600 via-orange-500 to-orange-400 bg-clip-text text-transparent mb-4">
+      <div className="tm-shell py-10">
+        <div className="relative mb-8 flex flex-col items-center gap-4">
+          <div className="flex flex-col items-center">
+            <span className="tm-section-kicker mb-3">每週課表</span>
+            <h1 className="tm-section-title">
               課程時間表
             </h1>
-            <div className="h-1.5 w-40 bg-gradient-to-r from-orange-500 to-orange-300 rounded-full"></div>
+            <div className="tm-title-underline"></div>
           </div>
           <button
             onClick={popup}
-            className="absolute right-0 top-0 inline-flex items-center px-5 py-2.5 bg-yellow-400 hover:bg-yellow-500 text-white rounded-lg transition-all duration-200 gap-2 shadow-md hover:shadow-lg"
+            className="tm-primary-btn static mt-2 md:absolute md:right-0 md:top-2"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

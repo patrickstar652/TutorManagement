@@ -32,14 +32,14 @@ function AddPayment({ onClose, student, scheduleId }) {
       ></div>
 
       {/* Main Card */}
-      <div className="relative w-full max-w-md bg-white rounded-3xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.25)] overflow-hidden transform transition-all border border-white/50 ring-1 ring-black/5">
+      <div className="relative w-full max-w-md overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-[0_22px_54px_-28px_rgba(15,35,65,0.42)] ring-1 ring-slate-200/70 transition-all">
         {/* Subtle top accent */}
-        <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-green-400 to-emerald-500"></div>
+        <div className="absolute left-0 right-0 top-0 h-1.5 bg-[#38bdf8]"></div>
 
         <div className="p-8">
           {/* Header */}
           <div className="mb-8 text-center">
-            <h2 className="text-2xl font-extrabold text-slate-800 tracking-tight">
+            <h2 className="text-2xl font-extrabold tracking-tight text-slate-900">
               更新繳費狀態
             </h2>
             <p className="text-slate-500 text-sm mt-1">請輸入最新的繳費資訊</p>
@@ -48,11 +48,11 @@ function AddPayment({ onClose, student, scheduleId }) {
           <div className="space-y-6">
             {/* Amount Input */}
             <div>
-              <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1">
+              <label className="ml-1 mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500">
                 金額
               </label>
               <div className="relative group">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold group-focus-within:text-green-500 transition-colors">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-slate-400 transition-colors group-focus-within:text-[#12345c]">
                   $
                 </span>
                 <input
@@ -60,21 +60,21 @@ function AddPayment({ onClose, student, scheduleId }) {
                   value={amount}
                   type="text"
                   placeholder="500"
-                  className="w-full pl-8 pr-4 py-3.5 bg-slate-50 border border-transparent rounded-2xl text-slate-800 font-semibold placeholder-slate-400 focus:bg-white focus:border-green-500/30 focus:ring-4 focus:ring-green-500/10 outline-none transition-all duration-200"
+                  className="tm-input pl-8"
                 />
               </div>
             </div>
 
             {/* Status Select */}
             <div>
-              <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1">
+              <label className="ml-1 mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500">
                 繳費狀態
               </label>
               <div className="relative">
                 <select
                   onChange={(e) => setStatus(e.target.value)}
                   value={status}
-                  className="w-full px-4 py-3.5 bg-slate-50 border border-transparent rounded-2xl text-slate-800 font-semibold focus:bg-white focus:border-green-500/30 focus:ring-4 focus:ring-green-500/10 outline-none transition-all duration-200 appearance-none cursor-pointer"
+                  className="tm-input cursor-pointer appearance-none"
                 >
                   <option value="已繳">已繳</option>
                   <option value="未繳">未繳</option>
@@ -103,13 +103,13 @@ function AddPayment({ onClose, student, scheduleId }) {
             <div className="flex gap-3 pt-4">
               <button
                 onClick={onClose}
-                className="flex-1 px-4 py-3.5 rounded-2xl font-bold text-slate-500 hover:bg-slate-50 hover:text-slate-700 transition-all duration-200"
+                className="tm-secondary-btn flex-1 px-4 py-3.5"
               >
                 取消
               </button>
               <button
                 onClick={fetchData}
-                className="flex-1 px-4 py-3.5 rounded-2xl font-bold text-white bg-gradient-to-r from-green-500 to-emerald-500 shadow-lg shadow-green-500/30 hover:shadow-green-500/40 hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-200"
+                className="tm-primary-btn flex-1 px-4 py-3.5"
               >
                 確認更新
               </button>

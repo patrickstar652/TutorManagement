@@ -54,13 +54,13 @@ function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
       <div className="w-full max-w-md">
         {/* 登入卡片 */}
         <div className="bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-xl border border-white/20">
           {/* 標題區域 */}
           <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 bg-black rounded-full flex items-center justify-center mx-auto mb-4 ring-4 ring-sky-100">
               <svg
                 className="w-8 h-8 text-white"
                 fill="none"
@@ -75,7 +75,7 @@ function Login() {
                 />
               </svg>
             </div>
-            <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
+            <h2 className="text-3xl font-bold text-black mb-2">
               歡迎回來
             </h2>
             <p className="text-gray-600">請登入您的帳戶</p>
@@ -109,7 +109,7 @@ function Login() {
                   value={account}
                   onChange={(e) => setAccount(e.target.value)}
                   required
-                  className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white"
+                  className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-300 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white"
                   placeholder="請輸入您的帳號"
                 />
               </div>
@@ -141,7 +141,7 @@ function Login() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white"
+                  className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-300 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white"
                   placeholder="請輸入您的密碼"
                 />
               </div>
@@ -150,7 +150,7 @@ function Login() {
             {/* 登入按鈕 */}
             <button
               type="submit"
-              className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              className="w-full bg-black hover:bg-black text-white font-semibold py-3 px-4 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-sky-300 focus:ring-offset-2"
             >
               <span className="flex items-center justify-center">
                 <svg

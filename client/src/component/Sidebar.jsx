@@ -36,17 +36,17 @@ function Sidebar() {
 
 	return (
 		<>
-			<div className="fixed left-4 top-24 h-auto bg-white shadow-2xl rounded-2xl z-20 border border-gray-200">
+			<div className="fixed left-4 top-24 h-auto bg-white/95 shadow-[0_18px_44px_-32px_rgba(15,35,65,0.38)] rounded-2xl z-20 border border-slate-200 backdrop-blur">
 				<nav className="py-3 px-2">
 					<button
 						onClick={() => setShowReminder(!showReminder)}
 						className={`flex flex-col items-center py-3 px-3 mb-2 rounded-lg transition-all duration-300 group ${
 							showReminder 
-								? "bg-gradient-to-r from-orange-500 to-orange-400 text-white shadow-lg transform scale-105" 
-								: "text-gray-600 hover:bg-orange-50 hover:text-orange-600 hover:scale-105"
+								? "bg-[#12345c] text-white shadow-lg transform scale-105" 
+								: "text-slate-600 hover:bg-slate-100 hover:text-[#12345c] hover:scale-105"
 						}`}
 					>
-						<FaUsers className={`text-lg mb-1 ${showReminder ? "text-white" : "group-hover:text-orange-600"}`} />
+						<FaUsers className={`text-lg mb-1 ${showReminder ? "text-white" : "group-hover:text-[#12345c]"}`} />
 						<span className="text-xs font-medium whitespace-nowrap">提醒事項</span>
 					</button>
 					
@@ -54,11 +54,11 @@ function Sidebar() {
 						onClick={() => setShowPayment(!showPayment)}
 						className={`flex flex-col items-center py-3 px-3 mb-2 rounded-lg transition-all duration-300 group ${
 							showPayment 
-								? "bg-gradient-to-r from-orange-500 to-orange-400 text-white shadow-lg transform scale-105" 
-								: "text-gray-600 hover:bg-orange-50 hover:text-orange-600 hover:scale-105"
+								? "bg-[#12345c] text-white shadow-lg transform scale-105" 
+								: "text-slate-600 hover:bg-slate-100 hover:text-[#12345c] hover:scale-105"
 						}`}
 					>
-						<FaCalendarAlt className={`text-lg mb-1 ${showPayment ? "text-white" : "group-hover:text-orange-600"}`} />
+						<FaCalendarAlt className={`text-lg mb-1 ${showPayment ? "text-white" : "group-hover:text-[#12345c]"}`} />
 						<span className="text-xs font-medium whitespace-nowrap">繳費資訊</span>
 					</button>
 				</nav>

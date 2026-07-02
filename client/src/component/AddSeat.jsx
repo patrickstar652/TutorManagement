@@ -33,15 +33,15 @@ function AddSeat({ scheduleId, seatId, onClose, onSave }) { // 接收 onSave pro
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 w-96 max-w-90vw">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/45 p-4 backdrop-blur-sm">
+      <div className="w-full max-w-sm rounded-3xl border border-slate-200 bg-white p-6 shadow-[0_24px_60px_-28px_rgba(15,35,65,0.48)]">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-semibold text-blue-800">
+          <h3 className="text-lg font-extrabold text-slate-900">
             編輯座位 {seatId}
           </h3>
           <button 
             onClick={close}
-            className="text-gray-500 hover:text-gray-700 text-xl"
+            className="flex h-9 w-9 items-center justify-center rounded-full text-xl text-slate-400 transition-colors hover:bg-slate-100 hover:text-[#12345c]"
           >
             ×
           </button>
@@ -49,14 +49,14 @@ function AddSeat({ scheduleId, seatId, onClose, onSave }) { // 接收 onSave pro
         
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="mb-2 block text-sm font-bold text-slate-700">
               學生姓名
             </label>
             <input
               type="text"
               value={name}
               onChange={(e)=>setName(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="tm-input"
               placeholder="請輸入學生姓名"
             />
           </div>
@@ -65,13 +65,13 @@ function AddSeat({ scheduleId, seatId, onClose, onSave }) { // 接收 onSave pro
             <button
               type="button"
               onClick={close}
-              className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
+              className="tm-secondary-btn px-4 py-2"
             >
               取消
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+              className="tm-primary-btn px-4 py-2"
             >
               儲存
             </button>
