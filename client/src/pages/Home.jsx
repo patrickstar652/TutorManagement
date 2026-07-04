@@ -198,8 +198,8 @@ function Home() {
           <div className="relative">
             <div className="absolute -inset-4 rotate-2 rounded-[2rem] bg-yellow-50 opacity-80"></div>
             <div className="tm-panel relative grid gap-4 p-5 sm:p-7">
-              <div className="flex items-start gap-4 rounded-2xl bg-white/72 p-4 transition-colors hover:bg-white">
-                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-slate-50 text-[#12345c] ring-1 ring-slate-200">
+              <div className="flex items-start gap-4 rounded-2xl border border-sky-100 bg-sky-50/80 p-4 transition-colors hover:bg-sky-50">
+                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white text-sky-700 shadow-sm ring-1 ring-sky-100">
                   <Headphones size={30} />
                 </div>
                 <div>
@@ -210,8 +210,8 @@ function Home() {
                 </div>
               </div>
 
-              <div className="flex items-start gap-4 rounded-2xl border border-slate-200 bg-slate-50/80 p-4 transition-colors hover:bg-white">
-                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white text-[#12345c] shadow-sm ring-1 ring-slate-200">
+              <div className="flex items-start gap-4 rounded-2xl border border-violet-100 bg-violet-50/80 p-4 transition-colors hover:bg-violet-50">
+                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white text-violet-700 shadow-sm ring-1 ring-violet-100">
                   <Repeat size={30} />
                 </div>
                 <div>
@@ -222,8 +222,8 @@ function Home() {
                 </div>
               </div>
 
-              <div className="flex items-start gap-4 rounded-2xl bg-yellow-50/80 p-4 transition-colors hover:bg-yellow-50">
-                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white text-[#f97316] shadow-sm">
+              <div className="flex items-start gap-4 rounded-2xl border border-amber-100 bg-amber-50/80 p-4 transition-colors hover:bg-amber-50">
+                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white text-amber-600 shadow-sm ring-1 ring-amber-100">
                   <svg className="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-6a2 2 0 012-2h8M9 17H5a2 2 0 01-2-2V7a2 2 0 012-2h4m0 12h10a2 2 0 002-2v-3M9 5h10a2 2 0 012 2v1" />
                   </svg>
@@ -328,7 +328,7 @@ function Home() {
                 {/* 社群圖標 */}
                 <a
                   href="#"
-                  className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-slate-50 text-slate-600 transition-all hover:bg-[#12345c] hover:text-white"
+                  className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-slate-50 text-slate-600 transition-all hover:bg-[#1877f2] hover:text-white"
                 >
                   <FaFacebook size={20} />
                 </a>
@@ -336,13 +336,13 @@ function Home() {
                   href="https://www.instagram.com/kuosung2019?igsh=MW8wZ3ZrN281Z3VnOQ=="
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-slate-50 text-slate-600 transition-all hover:bg-[#12345c] hover:text-white"
+                  className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-slate-50 text-slate-600 transition-all hover:bg-[#e1306c] hover:text-white"
                 >
                   <FaInstagram size={20} />
                 </a>
                 <a
                   href="#"
-                  className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-yellow-50 text-slate-600 transition-all hover:bg-[#f97316] hover:text-white"
+                  className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-yellow-50 text-slate-600 transition-all hover:bg-[#06c755] hover:text-white"
                 >
                   <FaLine size={20} />
                 </a>
