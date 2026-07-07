@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 // 引入 axios 用來發送 HTTP 請求
 import axios from "axios";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 function Login() {
   // 定義三個狀態變數：
@@ -10,10 +10,8 @@ function Login() {
   const [password, setPassword] = useState(""); // 使用者輸入的密碼
   const [message, setMessage] = useState(""); // 顯示伺服器回傳的訊息
   const navigate = useNavigate();
-  const location = useLocation();
 
-  // 取得使用者原本想要存取的頁面，如果沒有則預設為 /success
-  const from = location.state?.from?.pathname || "/success";
+  // 登入成功後導向課表頁面
   // 登入表單提交處理函式
   const handleLogin = async (e) => {
     e.preventDefault(); // 防止表單預設的重新整理行為
@@ -37,7 +35,7 @@ function Login() {
       if (response.data.success) {
         // ✅ 儲存 token 到 localStorage
         localStorage.setItem("token", response.data.token);
-        navigate(from, { replace: true });
+        navigate("/course", { replace: true });
       }
     } catch (error) {
       console.error("登入失敗，錯誤詳情:", error);
