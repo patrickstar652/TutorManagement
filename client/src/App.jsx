@@ -1,6 +1,5 @@
 import './style/App.css'
 import Login from './pages/Login'
-import Success from './pages/Success'
 import Course from './pages/Course'
 import Class from './pages/Class'
 import Seat from './pages/Seat' 
@@ -13,14 +12,6 @@ function App() {
     {
       path: "/",
       element: <Home />,
-    },
-    {
-      path: "/success",
-      element: (
-        <ProtectedRoute>
-          <Success />
-        </ProtectedRoute>
-      ),
     },
     {
       path: "/course",

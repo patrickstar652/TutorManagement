@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from "react";
-import { useParams } from "react-router-dom";
 import axios from "axios";
 
 // 定義星期對照表
@@ -14,12 +13,9 @@ const weekdayMap = {
 };
 
 function ShowCourse() {
-  const [course, setCourse] = useState([]);
   const [timeSlots, setTimeSlots] = useState([]);
   const [courseTable, setCourseTable] = useState({});
   const [refreshKey, setRefreshKey] = useState(0); // ✅ 刷新觸發器
-
-  const { courseId } = useParams();
 
   // ✅ 把抓課程資料邏輯抽成函式
   const fetchData = useCallback(async () => {
@@ -28,8 +24,6 @@ function ShowCourse() {
       const res = await axios.get("http://localhost:3000/showcourse", {
         headers: { Authorization: `Bearer ${token}` },
       });
-
-      setCourse(res.data);
 
       // step 1：產生時間區段
       const slots = Array.from(

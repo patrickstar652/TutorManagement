@@ -1,33 +1,10 @@
 const express = require("express");
 const router = express.Router();
 
-require("dotenv").config();
-const jwt = require("jsonwebtoken");
-const SECRET_KEY = process.env.SECRET_KEY;
-
 const pool = require("../db");
+const authMiddleware = require("../middleware/auth");
 
-const loggerMiddleware = (req, res, next) => {
-  const token = req.headers.authorization?.split(" ")[1];
-
-  if (!token) {
-    return res.status(401).json({ message: "Token 未提供" });
-  }
-
-  try {
-    const payload = jwt.verify(token, SECRET_KEY);
-    if (!payload?.id) {
-      return res.status(401).json({ message: "Token 無效：缺少使用者 id" });
-    }
-    req.user = { id: payload.id, account: payload.account };
-    next();
-  } catch (err) {
-    console.error("JWT 驗證失敗：", err);
-    return res.status(401).json({ message: "Token 無效或已過期" });
-  }
-};
-
-router.use(loggerMiddleware);
+router.use(authMiddleware);
 
 router.post("/reminder", async (req, res) => {
   const { title, description, remind_at, remind_date, schedule_id } = req.body || {};

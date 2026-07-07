@@ -1,6 +1,5 @@
 import Navbar from "../component/Navbar";
 import AddSeat from "../component/AddSeat";
-import Sidebar from "../component/Sidebar";
 import Reminder from "../component/Reminder";
 import Payment from "../component/Payment";
 import { useParams } from "react-router-dom";
@@ -79,8 +78,6 @@ function Seat() {
       }
     };
     fetchSeatData();
-    const {scheduleId} = useParams();
-    parseInt(scheduleId);
   };
 
 

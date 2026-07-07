@@ -1,4 +1,4 @@
-import { Link, useLocation, NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { FaBook, FaSun, FaMoon } from "react-icons/fa";
 import { IoLogOutOutline } from "react-icons/io5";
 import { School, CalendarCheck } from "lucide-react";
@@ -9,7 +9,6 @@ import { useState } from "react";
 
 function Navbar() {
   const [isDark, setIsDark] = useState(false);
-  const location = useLocation();
   const token = localStorage.getItem("token");
 
   // 安全地解碼 token

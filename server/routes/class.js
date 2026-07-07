@@ -1,181 +1,261 @@
 const express = require("express");
 const router = express.Router();
 
-require("dotenv").config();
-const jwt = require("jsonwebtoken");
-const SECRET_KEY = process.env.SECRET_KEY;
-
 const pool = require("../db");
+const authMiddleware = require("../middleware/auth");
 
-// Middleware: 驗證 Token
-const loggerMiddleware = (req, res, next) => {
-  const token = req.headers.authorization?.split(" ")[1];
-  
-  if (!token) {
-    return res.status(401).json({ message: "Token 未提供" });
-  }
+router.use(authMiddleware);
 
-  try {
-    const payload = jwt.verify(token, SECRET_KEY);
-    // 確保 payload 裡面有我們需要的 id
-    if (!payload?.id) {
-      return res.status(401).json({ message: "Token 無效：缺少使用者 id" });
-    }
-    // 把解碼後的資料掛在 req.user 上
-    req.user = { id: payload.id, account: payload.account };
-    next();
-  } catch (err) {
-    console.error("JWT 驗證失敗：", err);
-    return res.status(401).json({ message: "Token 無效或已過期" });
-  }
+const ensureClassForSchedule = async (client, scheduleId, userId) => {
+  const result = await client.query(
+    `
+      SELECT c.id, c.schedule_id, c.user_id
+      FROM class c
+      JOIN schedule s ON s.id = c.schedule_id
+      WHERE c.schedule_id = $1
+        AND c.user_id = $2
+        AND s.user_id = $2
+      FOR UPDATE OF c
+    `,
+    [scheduleId, userId]
+  );
+
+  return result.rows[0] || null;
 };
 
-// 套用 middleware
-router.use(loggerMiddleware);
+const syncLegacyMembers = async (client, classId) => {
+  await client.query(
+    `
+      UPDATE class c
+      SET members = COALESCE((
+        SELECT array_agg(cm.seat_id || ':' || s.name ORDER BY cm.seat_id)
+        FROM class_members cm
+        JOIN students s ON s.id = cm.student_id
+        WHERE cm.class_id = c.id
+      ), ARRAY[]::text[])
+      WHERE c.id = $1
+    `,
+    [classId]
+  );
+};
 
-// 取得課程列表
 router.get("/class", async (req, res) => {
   try {
-    const result = await pool.query(`
-      SELECT 
-        c.id as class_id,
-        c.schedule_id,
-        s.course_name,
-        s.weekday,
-        s.start_time,
-        s.end_time
-      FROM class c 
-      JOIN schedule s ON c.schedule_id = s.id
-      WHERE c.user_id = $1
-    `, [req.user.id]);
-    res.status(200).json(result.rows);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Database query failed" });
+    const result = await pool.query(
+      `
+        SELECT
+          c.id AS class_id,
+          c.schedule_id,
+          s.course_name,
+          s.weekday,
+          s.start_time,
+          s.end_time,
+          COUNT(cm.id)::int AS student_count
+        FROM class c
+        JOIN schedule s ON c.schedule_id = s.id
+        LEFT JOIN class_members cm ON cm.class_id = c.id
+        WHERE c.user_id = $1
+        GROUP BY c.id, c.schedule_id, s.course_name, s.weekday, s.start_time, s.end_time
+        ORDER BY s.weekday, s.start_time
+      `,
+      [req.user.id]
+    );
+
+    return res.status(200).json(result.rows);
+  } catch (error) {
+    console.error("取得班級失敗：", error);
+    return res.status(500).json({ error: "Database query failed" });
   }
 });
 
-// 🔥 更新座位 (同時處理繳費單建檔)
 router.patch("/seat", async (req, res) => {
-  const { schedule_id, seat_id, name } = req.body;
+  const scheduleId = Number(req.body?.schedule_id);
+  const seatId = String(req.body?.seat_id || "").trim();
+  const name = String(req.body?.name || "").trim();
+
+  if (!scheduleId || !seatId) {
+    return res.status(400).json({
+      success: false,
+      message: "schedule_id 和 seat_id 為必填",
+    });
+  }
+
+  const client = await pool.connect();
 
   try {
-    // 1. 驗證必要欄位
-    if (!schedule_id || !seat_id) {
-      return res.status(400).json({
-        success: false,
-        message: "schedule_id 和 seat_id 是必要欄位",
-      });
-    }
+    await client.query("BEGIN");
 
-    // 2. 先取得現有的 members 陣列並檢查權限
-    const currentResult = await pool.query(
-      "SELECT members FROM class WHERE schedule_id = $1 AND user_id = $2",
-      [schedule_id, req.user.id]
-    );
+    const classRow = await ensureClassForSchedule(client, scheduleId, req.user.id);
 
-    if (currentResult.rows.length === 0) {
+    if (!classRow) {
+      await client.query("ROLLBACK");
       return res.status(404).json({
         success: false,
-        message: "找不到指定的課程",
+        message: "班級不存在或無權限操作",
       });
     }
 
-    // 3. 處理座位陣列邏輯
-    let members = currentResult.rows[0].members || [];
-    const seatString = `${seat_id}:${name || ""}`; // 格式: "A1:王小明"
+    if (!name) {
+      await client.query(
+        "DELETE FROM class_members WHERE class_id = $1 AND seat_id = $2",
+        [classRow.id, seatId]
+      );
+      await syncLegacyMembers(client, classRow.id);
+      await client.query("COMMIT");
 
-    // 檢查該座位 ID 是否已存在
-    const existingIndex = members.findIndex((member) =>
-      member.startsWith(`${seat_id}:`)
-    );
-
-    if (existingIndex >= 0) {
-      members[existingIndex] = seatString; // 更新舊座位
-    } else {
-      members.push(seatString); // 新增新座位
+      return res.status(200).json({
+        success: true,
+        message: "座位已清空",
+      });
     }
 
-    // 4. 更新 Class 表的 members 陣列
-    const result = await pool.query(
-      "UPDATE class SET members = $1::text[] WHERE schedule_id = $2 AND user_id = $3 RETURNING *",
-      [members, schedule_id, req.user.id]
+    const studentResult = await client.query(
+      `
+        INSERT INTO students (user_id, name)
+        VALUES ($1, $2)
+        ON CONFLICT (user_id, name)
+        DO UPDATE SET updated_at = CURRENT_TIMESTAMP
+        RETURNING id, name
+      `,
+      [req.user.id, name]
     );
+    const student = studentResult.rows[0];
 
-    // 🔥 5. 同步處理 Payments 表 (新邏輯)
-    // 如果有輸入名字，我們要幫他在繳費表「掛號」
-    if (name) {
-      // 5-1. 先檢查這個學生在這堂課是否已經有繳費紀錄了 (避免重複)
-      // 注意：這裡假設你的欄位叫 student_name，如果不是請修改
-      const checkPayment = await pool.query(
-        "SELECT id FROM payments WHERE schedule_id = $1 AND student_name = $2",
-        [schedule_id, name]
+    const existingMemberResult = await client.query(
+      `
+        SELECT id, student_id
+        FROM class_members
+        WHERE class_id = $1 AND seat_id = $2
+      `,
+      [classRow.id, seatId]
+    );
+    const existingMember = existingMemberResult.rows[0] || null;
+
+    let classMemberId;
+
+    if (existingMember?.student_id === student.id) {
+      classMemberId = existingMember.id;
+      await client.query(
+        "UPDATE class_members SET updated_at = CURRENT_TIMESTAMP WHERE id = $1",
+        [classMemberId]
+      );
+    } else {
+      await client.query(
+        `
+          DELETE FROM class_members
+          WHERE class_id = $1
+            AND (seat_id = $2 OR student_id = $3)
+        `,
+        [classRow.id, seatId, student.id]
       );
 
-      // 5-2. 如果沒資料，才插入一筆新的「未繳」紀錄
-      if (checkPayment.rows.length === 0) {
-        await pool.query(
-          `INSERT INTO payments (schedule_id, student_name, status, amount, created_at) 
-           VALUES ($1, $2, '未繳', 0, NOW())`,
-          [schedule_id, name]
-        );
-        console.log(`已自動為學生 ${name} 建立未繳費單據`);
-      }
+      const memberResult = await client.query(
+        `
+          INSERT INTO class_members (class_id, student_id, seat_id)
+          VALUES ($1, $2, $3)
+          RETURNING id
+        `,
+        [classRow.id, student.id, seatId]
+      );
+      classMemberId = memberResult.rows[0].id;
     }
 
-    res.status(200).json({
-      success: true,
-      message: "座位資料更新成功 (同步更新繳費單)",
-      data: result.rows[0],
-    });
+    const existingPayment = await client.query(
+      "SELECT id FROM payments WHERE class_member_id = $1",
+      [classMemberId]
+    );
 
+    if (existingPayment.rowCount === 0) {
+      await client.query(
+        `
+          INSERT INTO payments (schedule_id, class_member_id, student_name, status, amount)
+          VALUES ($1, $2, $3, '未繳', 0)
+        `,
+        [scheduleId, classMemberId, name]
+      );
+    } else {
+      await client.query(
+        `
+          UPDATE payments
+          SET student_name = $1,
+              updated_at = CURRENT_TIMESTAMP
+          WHERE class_member_id = $2
+        `,
+        [name, classMemberId]
+      );
+    }
+
+    await syncLegacyMembers(client, classRow.id);
+    await client.query("COMMIT");
+
+    return res.status(200).json({
+      success: true,
+      message: "座位資料已更新",
+      data: { schedule_id: scheduleId, seat_id: seatId, name },
+    });
   } catch (error) {
-    console.error("更新座位資料錯誤:", error);
-    res.status(500).json({
+    await client.query("ROLLBACK");
+    console.error("更新座位失敗：", error);
+    return res.status(500).json({
       success: false,
-      message: "更新失敗",
+      message: "更新座位失敗",
       error: error.message,
     });
+  } finally {
+    client.release();
   }
 });
 
-// 取得座位資料
 router.get("/seat/:scheduleId", async (req, res) => {
-  const { scheduleId } = req.params;
+  const scheduleId = Number(req.params.scheduleId);
+
+  if (!scheduleId) {
+    return res.status(400).json({
+      success: false,
+      message: "scheduleId 無效",
+    });
+  }
 
   try {
-    const result = await pool.query(
-      "SELECT members FROM class WHERE schedule_id = $1 AND user_id = $2",
+    const classResult = await pool.query(
+      `
+        SELECT c.id
+        FROM class c
+        JOIN schedule s ON s.id = c.schedule_id
+        WHERE c.schedule_id = $1
+          AND c.user_id = $2
+          AND s.user_id = $2
+      `,
       [scheduleId, req.user.id]
     );
 
-    if (result.rows.length === 0) {
+    if (classResult.rowCount === 0) {
       return res.status(404).json({
         success: false,
-        message: "找不到指定的課程",
+        message: "班級不存在或無權限操作",
       });
     }
 
-    const members = result.rows[0].members || [];
+    const result = await pool.query(
+      `
+        SELECT cm.seat_id, s.name
+        FROM class_members cm
+        JOIN students s ON s.id = cm.student_id
+        WHERE cm.class_id = $1
+        ORDER BY cm.seat_id
+      `,
+      [classResult.rows[0].id]
+    );
 
-    // 將字串陣列轉換為物件陣列給前端
-    const seatsData = members.map((member) => {
-      // 預防資料格式有誤，做個簡單的錯誤處理
-      if (!member.includes(":")) return { seat_id: member, name: "" };
-      
-      const [seat_id, name] = member.split(":");
-      return { seat_id, name };
-    });
-
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
-      data: seatsData,
+      data: result.rows,
     });
   } catch (error) {
-    console.error("取得座位資料錯誤:", error);
-    res.status(500).json({
+    console.error("取得座位資料失敗：", error);
+    return res.status(500).json({
       success: false,
-      message: "取得資料失敗",
+      message: "取得座位資料失敗",
       error: error.message,
     });
   }
