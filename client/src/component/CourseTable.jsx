@@ -1,3 +1,5 @@
+import { FaTrashAlt } from "react-icons/fa";
+
 const weekdayMap = {
   1: "星期一",
   2: "星期二",
@@ -51,39 +53,23 @@ function CourseTable({ courseTable, onDelete, timeSlots }) {
                     }`}
                   >
                     {course ? (
-                      <>
-                        <div className="mx-auto rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm font-extrabold text-[#12345c] shadow-sm">
-                          {course.courseName}
-                        </div>
-                        <div
-                          className="pointer-events-none absolute left-1/2 top-full z-50 mt-1 -translate-x-1/2 translate-y-[-8px] pb-2 opacity-0 transition-all delay-200 duration-500 ease-out hover:translate-y-0 hover:opacity-100 hover:delay-0 group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:opacity-100 group-hover:delay-0"
+                      <div className="relative mx-auto flex min-h-[52px] min-w-[180px] max-w-[220px] items-center justify-center rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-extrabold text-[#12345c] shadow-sm transition-all duration-200 group-hover:-translate-y-0.5 group-hover:border-red-100 group-hover:shadow-[0_16px_28px_-24px_rgba(220,38,38,0.65)]">
+                          <span className="truncate">
+                            {course.courseName}
+                          </span>
+                        <button
+                          aria-label={`刪除 ${course.courseName}`}
+                          className="absolute right-0 top-1/2 z-10 flex h-9 w-9 translate-x-[calc(100%+0.5rem)] -translate-y-1/2 items-center justify-center rounded-xl border border-red-100 bg-red-50 text-red-600 opacity-0 shadow-sm transition-all duration-200 hover:bg-red-600 hover:text-white hover:shadow-lg hover:shadow-red-500/30 focus:translate-x-[calc(100%+0.25rem)] focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-red-200 active:scale-95 group-hover:translate-x-[calc(100%+0.25rem)] group-hover:opacity-100"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            onDelete(course.courseId);
+                          }}
+                          title="刪除課程"
+                          type="button"
                         >
-                          <div
-                            className="min-w-[120px] rounded-2xl border border-slate-200 bg-white p-3 shadow-xl transition-shadow duration-300 before:absolute before:left-1/2 before:top-[-6px] before:h-0 before:w-0 before:-translate-x-1/2 before:border-b-[6px] before:border-l-[6px] before:border-r-[6px] before:border-b-white before:border-l-transparent before:border-r-transparent before:drop-shadow-sm hover:shadow-2xl"
-                          >
-                            <button
-                              className="flex w-full items-center justify-center gap-2 rounded-xl bg-red-600 px-4 py-2.5 text-sm font-bold text-white transition-all duration-200 ease-out hover:scale-105 hover:bg-red-700 hover:shadow-lg hover:shadow-red-500/40 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 active:scale-95"
-                              onClick={() => onDelete(course.courseId)}
-                              type="button"
-                            >
-                              <svg
-                                className="h-4 w-4"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                                />
-                              </svg>
-                              刪除
-                            </button>
-                          </div>
-                        </div>
-                      </>
+                          <FaTrashAlt className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
                     ) : null}
                   </td>
                 );
