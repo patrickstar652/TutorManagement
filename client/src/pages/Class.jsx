@@ -1,25 +1,9 @@
 import Navbar from "../component/Navbar";
 import { Link } from "react-router-dom";
-import { useEffect, useState } from "react";
-import axios from "axios";
+import { useClasses } from "../hooks/useClasses";
 
 function Class() {
-  const [classes, setClasses] = useState([]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const res = await axios.get("http://localhost:3000/class", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setClasses(res.data);
-      } catch (error) {
-        console.error("Fetch error:", error);
-      }
-    };
-    fetchData();
-  }, []);
+  const { classes, error, loading } = useClasses();
 
   return (
     <div className="tm-page">
@@ -33,6 +17,16 @@ function Class() {
           <div className="tm-title-underline mb-4"></div>
 
           <div className="tm-panel w-full p-4 sm:p-6">
+            {loading && (
+              <div className="p-6 text-center font-semibold text-slate-500">
+                載入班級中...
+              </div>
+            )}
+            {error && (
+              <div className="p-6 text-center font-semibold text-red-600">
+                {error}
+              </div>
+            )}
             <ul className="w-full space-y-4">
               {classes.map((item) => (
                 <li

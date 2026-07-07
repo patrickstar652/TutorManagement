@@ -5,18 +5,30 @@ require("dotenv").config({ path: path.join(__dirname, ".env") });
 const express = require('express');
 // 引入 CORS 中介軟體，處理跨域請求
 const cors = require('cors');
+const config = require("./config");
+const errorHandler = require("./middleware/errorHandler");
 // 建立一個 Express 應用
 const app = express();
-// 設定伺服器的監聽埠號
-const PORT = 3000;
+
+const corsOptions = {
+  origin(origin, callback) {
+    if (config.clientOrigins === "*") {
+      return callback(null, true);
+    }
+
+    if (!origin || config.clientOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    return callback(new Error("Not allowed by CORS"));
+  },
+  methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE','OPTIONS'],
+  allowedHeaders: '*',
+  credentials: false,
+};
 
 // 啟用 CORS，允許任何來源的跨域請求
-app.use(cors({
-  origin: '*',                // 允許所有來源（＊表示不限制）
-  methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE','OPTIONS'],  // 允許這些 HTTP 方法
-  allowedHeaders: '*',         // 允許所有標頭
-  credentials: false           // 不允許附帶 cookie
-}));
+app.use(cors(corsOptions));
 
 // express 內建的 middleware，讓伺服器能夠解析 JSON 格式的請求內容 
 // 解析前端送來的 JSON 格式資料 註冊中介層
@@ -24,20 +36,21 @@ app.use(cors({
 app.use(express.json());
 
 // 同種類型的處理放一個檔案
-const postRoutes = require('./routes/post');
+const courseRoutes = require('./routes/course');
 const successRoutes = require('./routes/user');
 const classRoutes = require('./routes/class');
 const reminderRoutes = require('./routes/reminder');
 const paymentRoutes = require('./routes/payment');
 app.use('/', successRoutes); // 所有 /welcome 路由就掛上來了
-app.use('/', postRoutes);
+app.use('/', courseRoutes);
 app.use('/', classRoutes);
 app.use('/', reminderRoutes);
 app.use('/', paymentRoutes);
+app.use(errorHandler);
 
 // 啟動伺服器，開始監聽指定的埠號
-app.listen(PORT, () => {
-  console.log(`✅ Server running at http://localhost:${PORT}`);
+app.listen(config.port, () => {
+  console.log(`✅ Server running at http://localhost:${config.port}`);
 });
 
 //403 跨域禁止

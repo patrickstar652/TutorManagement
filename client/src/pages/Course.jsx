@@ -1,10 +1,34 @@
 import AddCourse from "../component/AddCourse";
 import Navbar from "../component/Navbar";
 import ShowCourse from "../component/ShowCourse";
+import { useState } from "react";
+import { getApiErrorMessage } from "../api/axiosClient";
+import { useCourses } from "../hooks/useCourses";
+
 function Course() {
-  const popup = () => {
-    document.querySelector(".popupWindow").classList.remove("hidden");
+  const [isAddOpen, setIsAddOpen] = useState(false);
+  const {
+    addCourse,
+    courseTable,
+    error,
+    loading,
+    removeCourse,
+    timeSlots,
+  } = useCourses();
+
+  const handleCreateCourse = async (course) => {
+    await addCourse(course);
+    setIsAddOpen(false);
   };
+
+  const handleDeleteCourse = async (courseId) => {
+    try {
+      await removeCourse(courseId);
+    } catch (error) {
+      alert(getApiErrorMessage(error, "刪除課程失敗，請稍後再試"));
+    }
+  };
+
   return (
     <div className="tm-page">
       <Navbar/>
@@ -18,7 +42,7 @@ function Course() {
             <div className="tm-title-underline"></div>
           </div>
           <button
-            onClick={popup}
+            onClick={() => setIsAddOpen(true)}
             className="tm-primary-btn static mt-2 md:absolute md:right-0 md:top-2"
           >
             <svg
@@ -33,8 +57,18 @@ function Course() {
           </button>
         </div>
       </div>
-      <ShowCourse />
-      <AddCourse />
+      <ShowCourse
+        courseTable={courseTable}
+        error={error}
+        loading={loading}
+        onDelete={handleDeleteCourse}
+        timeSlots={timeSlots}
+      />
+      <AddCourse
+        onClose={() => setIsAddOpen(false)}
+        onCreate={handleCreateCourse}
+        open={isAddOpen}
+      />
     </div>
   );
 }

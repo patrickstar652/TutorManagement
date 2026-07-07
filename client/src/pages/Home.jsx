@@ -1,34 +1,16 @@
 import Navbar from "../component/Navbar";
 import Carousel from "../component/Carousel";
 import { useNavigate } from "react-router-dom";
-import { jwtDecode } from "jwt-decode";
 import { FaFacebook, FaInstagram, FaLine } from "react-icons/fa";
 import { Headphones, Repeat } from "lucide-react";
+import { useAuth } from "../context/authContext";
 
 function Home() {
   const navigate = useNavigate();
-
-  const checkAuth = () => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) return false;
-
-      const decodedToken = jwtDecode(token);
-      const currentTime = Date.now() / 1000;
-
-      if (decodedToken.exp < currentTime) {
-        localStorage.removeItem("token");
-        return false;
-      }
-      return true;
-    } catch {
-      localStorage.removeItem("token");
-      return false;
-    }
-  };
+  const { isAuthenticated } = useAuth();
 
   const handleStartUsing = () => {
-    if (checkAuth()) {
+    if (isAuthenticated) {
       navigate("/course");
     } else {
       navigate("/login");

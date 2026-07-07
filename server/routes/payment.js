@@ -3,40 +3,25 @@ const router = express.Router();
 
 const pool = require("../db");
 const authMiddleware = require("../middleware/auth");
+const asyncHandler = require("../middleware/asyncHandler");
+const HttpError = require("../utils/httpError");
+const { success } = require("../utils/response");
+const withTransaction = require("../utils/transaction");
+const {
+  paymentUpdateRequest,
+  scheduleIdParam,
+} = require("../validators/requestValidators");
 
 router.use(authMiddleware);
 
-const normalizeStatus = (status) => {
-  if (["已繳", "paid", "PAID", "Paid"].includes(status)) return "已繳";
-  if (["未繳", "unpaid", "UNPAID", "Unpaid"].includes(status)) return "未繳";
-  return null;
-};
+const updatePayment = asyncHandler(async (req, res) => {
+  const { amount, classMemberId, scheduleId, status, student } =
+    paymentUpdateRequest({
+      body: req.body,
+      params: req.params,
+    });
 
-const normalizeAmount = (amount) => {
-  const value = Number(amount);
-  return Number.isFinite(value) && value >= 0 ? Math.trunc(value) : null;
-};
-
-router.patch("/payment", async (req, res) => {
-  const scheduleId = Number(req.body?.scheduleId);
-  const classMemberId = req.body?.classMemberId ? Number(req.body.classMemberId) : null;
-  const student = String(req.body?.student || "").trim();
-  const amount = normalizeAmount(req.body?.amount);
-  const status = normalizeStatus(req.body?.status);
-
-  if (!scheduleId || (!classMemberId && !student)) {
-    return res.status(400).json({ message: "scheduleId 與學生資料為必填" });
-  }
-
-  if (amount === null || !status) {
-    return res.status(400).json({ message: "amount 或 status 格式不正確" });
-  }
-
-  const client = await pool.connect();
-
-  try {
-    await client.query("BEGIN");
-
+  const payment = await withTransaction(async (client) => {
     const memberResult = await client.query(
       `
         SELECT cm.id AS class_member_id, s.name AS student_name
@@ -56,8 +41,12 @@ router.patch("/payment", async (req, res) => {
     );
 
     if (memberResult.rowCount === 0) {
-      await client.query("ROLLBACK");
-      return res.status(404).json({ message: "找不到學生或無權限更新" });
+      throw new HttpError(
+        404,
+        "找不到學生或無權限更新",
+        null,
+        "PAYMENT_MEMBER_NOT_FOUND"
+      );
     }
 
     const member = memberResult.rows[0];
@@ -67,10 +56,8 @@ router.patch("/payment", async (req, res) => {
       [member.class_member_id]
     );
 
-    let result;
-
     if (existingPayment.rowCount === 0) {
-      result = await client.query(
+      const result = await client.query(
         `
           INSERT INTO payments (schedule_id, class_member_id, student_name, amount, status)
           VALUES ($1, $2, $3, $4, $5)
@@ -78,74 +65,64 @@ router.patch("/payment", async (req, res) => {
         `,
         [scheduleId, member.class_member_id, member.student_name, amount, status]
       );
-    } else {
-      result = await client.query(
-        `
-          UPDATE payments
-          SET amount = $1,
-              status = $2,
-              student_name = $3,
-              updated_at = CURRENT_TIMESTAMP
-          WHERE class_member_id = $4
-          RETURNING *
-        `,
-        [amount, status, member.student_name, member.class_member_id]
-      );
+
+      return result.rows[0];
     }
 
-    await client.query("COMMIT");
-
-    return res.status(200).json({
-      message: "更新成功",
-      data: result.rows[0],
-    });
-  } catch (error) {
-    await client.query("ROLLBACK");
-    console.error("更新繳費資料失敗：", error);
-    return res.status(500).json({ message: "更新失敗" });
-  } finally {
-    client.release();
-  }
-});
-
-router.get("/payment/:scheduleId", async (req, res) => {
-  const scheduleId = Number(req.params.scheduleId);
-
-  if (!scheduleId) {
-    return res.status(400).json({ message: "scheduleId 無效" });
-  }
-
-  try {
-    const result = await pool.query(
+    const result = await client.query(
       `
-        SELECT
-          p.id,
-          $1::int AS schedule_id,
-          cm.id AS class_member_id,
-          cm.seat_id,
-          COALESCE(p.student_name, s.name) AS student_name,
-          COALESCE(p.amount, 0) AS amount,
-          COALESCE(p.status, '未繳') AS status,
-          COALESCE(p.created_at, cm.created_at) AS created_at,
-          p.updated_at
-        FROM class c
-        JOIN schedule sch ON sch.id = c.schedule_id
-        JOIN class_members cm ON cm.class_id = c.id
-        JOIN students s ON s.id = cm.student_id
-        LEFT JOIN payments p ON p.class_member_id = cm.id
-        WHERE c.schedule_id = $1
-          AND c.user_id = $2
-          AND sch.user_id = $2
-        ORDER BY cm.seat_id
+        UPDATE payments
+        SET amount = $1,
+            status = $2,
+            student_name = $3,
+            updated_at = CURRENT_TIMESTAMP
+        WHERE class_member_id = $4
+        RETURNING *
       `,
-      [scheduleId, req.user.id]
+      [amount, status, member.student_name, member.class_member_id]
     );
 
-    return res.status(200).json(result.rows);
-  } catch (error) {
-    console.error("取得繳費資料失敗：", error);
-    return res.status(500).json({ message: "取得失敗" });
-  }
+    return result.rows[0];
+  });
+
+  return success(res, payment, { message: "更新成功" });
 });
+
+const listPayments = asyncHandler(async (req, res) => {
+  const { scheduleId } = scheduleIdParam(req.params);
+
+  const result = await pool.query(
+    `
+      SELECT
+        p.id,
+        $1::int AS schedule_id,
+        cm.id AS class_member_id,
+        cm.seat_id,
+        COALESCE(p.student_name, s.name) AS student_name,
+        COALESCE(p.amount, 0) AS amount,
+        COALESCE(p.status, '未繳') AS status,
+        COALESCE(p.created_at, cm.created_at) AS created_at,
+        p.updated_at
+      FROM class c
+      JOIN schedule sch ON sch.id = c.schedule_id
+      JOIN class_members cm ON cm.class_id = c.id
+      JOIN students s ON s.id = cm.student_id
+      LEFT JOIN payments p ON p.class_member_id = cm.id
+      WHERE c.schedule_id = $1
+        AND c.user_id = $2
+        AND sch.user_id = $2
+      ORDER BY cm.seat_id
+    `,
+    [scheduleId, req.user.id]
+  );
+
+  return success(res, result.rows);
+});
+
+router.patch("/classes/:scheduleId/payments", updatePayment);
+router.get("/classes/:scheduleId/payments", listPayments);
+
+router.patch("/payment", updatePayment);
+router.get("/payment/:scheduleId", listPayments);
 
 module.exports = router;

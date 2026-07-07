@@ -1,38 +1,27 @@
 
 import { useParams } from "react-router-dom";
 import { FaUsers, FaCalendarAlt } from "react-icons/fa";
-import { useState, useEffect } from "react";
+import { useMemo, useState } from "react";
 import AddReminder from "./AddReminder";
-import axios from "axios";
+import { useClasses } from "../hooks/useClasses";
+import { useReminders } from "../hooks/useReminders";
 
 function Sidebar() {
 	const { scheduleId } = useParams(); // 從路由參數取得
 	const [showReminder, setShowReminder] = useState(false);
 	const [showPayment, setShowPayment] = useState(false);
-	const [courseName, setCourseName] = useState("");
+	const { classes } = useClasses();
+	const { addReminder } = useReminders(scheduleId);
 
-	// 如果在座位頁面，取得課程名稱
-	useEffect(() => {
-		if (scheduleId) {
-			const fetchCourseName = async () => {
-				try {
-					const token = localStorage.getItem('token');
-					const response = await axios.get('http://localhost:3000/class', {
-						headers: {
-							Authorization: `Bearer ${token}`
-						}
-					});
-					const course = response.data.find(c => c.schedule_id == scheduleId);
-					if (course) {
-						setCourseName(course.course_name);
-					}
-				} catch (error) {
-					console.error("取得課程資訊失敗:", error);
-				}
-			};
-			fetchCourseName();
-		}
-	}, [scheduleId]);
+	const courseName = useMemo(() => {
+		const course = classes.find((item) => item.schedule_id == scheduleId);
+		return course?.course_name || "";
+	}, [classes, scheduleId]);
+
+	const handleCreateReminder = async (reminder) => {
+		await addReminder(reminder);
+		setShowReminder(false);
+	};
 
 	return (
 		<>
@@ -67,6 +56,7 @@ function Sidebar() {
 			{showReminder && (
 				<AddReminder 
 					onClose={() => setShowReminder(false)}
+					onCreate={handleCreateReminder}
 					scheduleId={scheduleId}
 					courseName={courseName}
 				/>

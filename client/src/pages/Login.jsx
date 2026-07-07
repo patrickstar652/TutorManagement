@@ -1,8 +1,9 @@
 // 引入 React 與 useState Hook
 import React, { useState } from "react";
-// 引入 axios 用來發送 HTTP 請求
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { getApiErrorMessage } from "../api/axiosClient";
+import { login as loginRequest } from "../api/authApi";
+import { useAuth } from "../context/authContext";
 
 function Login() {
   // 定義三個狀態變數：
@@ -10,6 +11,7 @@ function Login() {
   const [password, setPassword] = useState(""); // 使用者輸入的密碼
   const [message, setMessage] = useState(""); // 顯示伺服器回傳的訊息
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   // 登入成功後導向課表頁面
   // 登入表單提交處理函式
@@ -18,36 +20,20 @@ function Login() {
     try {
       console.log("開始發送登入請求...");
 
-      // 發送 POST 請求到後端伺服器
-      // data: { success: true, message: '登入成功' } // ← 回傳的 JSON 內容
-      // axios 自動你包好的屬性
-      const response = await axios.post("http://localhost:3000/login", {
+      const data = await loginRequest({
         account,
         password,
       });
 
-      console.log("收到伺服器回應:", response.data);
-
-      // 將伺服器回傳的訊息設定到 message 狀態
-      setMessage(response.data.message);
-
-      // 如果登入成功，導向到原本想要存取的頁面
-      if (response.data.success) {
-        // ✅ 儲存 token 到 localStorage
-        localStorage.setItem("token", response.data.token);
+      if (data.token) {
+        setMessage("登入成功");
+        login(data.token);
         navigate("/course", { replace: true });
       }
     } catch (error) {
       console.error("登入失敗，錯誤詳情:", error);
 
-      // 根據錯誤類型顯示不同的錯誤訊息
-      if (error.code === "ERR_NETWORK") {
-        // 如果是網路錯誤，表示伺服器連不到
-        setMessage("無法連接到伺服器，請確認伺服器是否已啟動");
-      } else {
-        // 其他錯誤，優先顯示伺服器回傳的錯誤訊息，否則顯示「未知錯誤」
-        setMessage(error.response?.data?.message || "發生未知錯誤");
-      }
+      setMessage(getApiErrorMessage(error, "發生未知錯誤"));
     }
   };
 
@@ -235,4 +221,4 @@ export default Login;
 //⬇
 //<input value="abc" />
 //⬇
-//按下登入 → axios.post(account)
+//按下登入 → authApi.login(account)

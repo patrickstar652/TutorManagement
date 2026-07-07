@@ -1,8 +1,8 @@
 import { useState } from "react";
-import axios from "axios";
 
-function AddSeat({ scheduleId, seatId, onClose, onSave }) { // 接收 onSave props
+function AddSeat({ seatId, onClose, onSave }) { // 接收 onSave props
   const [name, setName] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
   
   const close = () => {
     setName(""); // 清空表單
@@ -11,24 +11,16 @@ function AddSeat({ scheduleId, seatId, onClose, onSave }) { // 接收 onSave pro
   
   const handleSubmit = async(e) => {
     e.preventDefault();
+    setIsSaving(true);
     try {
-      const token = localStorage.getItem('token');
-      await axios.patch("http://localhost:3000/seat", { // 改為 PATCH
-        schedule_id: scheduleId,
-        seat_id: seatId,
-        name
-      }, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
       if (onSave) {
-        onSave(); // 通知父元件重新載入資料
+        await onSave(name); // 通知父元件重新載入資料
       }
-      close();
     } catch(error) {
       console.error("儲存失敗:", error);
       alert("儲存失敗，請稍後再試");
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -72,8 +64,9 @@ function AddSeat({ scheduleId, seatId, onClose, onSave }) { // 接收 onSave pro
             <button
               type="submit"
               className="tm-primary-btn px-4 py-2"
+              disabled={isSaving}
             >
-              儲存
+              {isSaving ? "儲存中..." : "儲存"}
             </button>
           </div>
         </form>

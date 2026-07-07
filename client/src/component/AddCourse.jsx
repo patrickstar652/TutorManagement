@@ -1,18 +1,27 @@
 import { useState } from "react";
-import axios from "axios";
 import { TimePicker } from "antd";
 import "antd/dist/reset.css";
+import { getApiErrorMessage } from "../api/axiosClient";
 
-function AddCourse() {
-  const close = () => {
-    document.querySelector(".popupWindow").classList.add("hidden");
-  };
-
+function AddCourse({ onClose, onCreate, open }) {
   // 全底線命名
   const [course_name, set_course_name] = useState("");
   const [weekday, set_weekday] = useState("");       // 使用者未選時是空字串
   const [start_time, set_start_time] = useState(null); // antd v5 dayjs
   const [end_time, set_end_time] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
+
+  const resetForm = () => {
+    set_course_name("");
+    set_weekday("");
+    set_start_time(null);
+    set_end_time(null);
+  };
+
+  const close = () => {
+    resetForm();
+    onClose();
+  };
 
   const handleForm = async (e) => {
     e.preventDefault();
@@ -28,54 +37,32 @@ function AddCourse() {
       return;
     }
 
+    setIsSaving(true);
     try {
-      const token = localStorage.getItem("token");
-
-      const payload = {
+      await onCreate({
         course_name,
         weekday: Number(weekday),                 // 確保是數字
         start_time: start_time.format("HH:mm"),
         end_time: end_time.format("HH:mm"),
-      };
-
-      await axios.post("http://localhost:3000/course", payload, {
-        headers: { Authorization: `Bearer ${token}` },
       });
 
-      // 先廣播 → 再關視窗（確保監聽端能接到）
-      window.dispatchEvent(
-        new CustomEvent("course:changed", { detail: { type: "created" } })
-      );
-
-      // 清空表單（可選）
-      set_course_name("");
-      set_weekday("");
-      set_start_time(null);
-      set_end_time(null);
-
-      close();
+      resetForm();
     } catch (error) {
       console.error("❌ 新增課程失敗:", error);
-      
-      // 處理錯誤訊息
-      let errorMessage = "新增課程失敗，請稍後再試";
-      
-      if (error.response?.data?.message) {
-        errorMessage = error.response.data.message;
-      } else if (error.response?.data?.error) {
-        errorMessage = error.response.data.error;
-      } else if (error.message) {
-        errorMessage = error.message;
-      }
-      
-      alert(errorMessage);
+      alert(getApiErrorMessage(error, "新增課程失敗，請稍後再試"));
+    } finally {
+      setIsSaving(false);
     }
   };
+
+  if (!open) {
+    return null;
+  }
 
   return (
     <>
       <div className="min-h-screen bg-stone-50">
-        <div className="popupWindow hidden fixed inset-0 z-40 flex items-center justify-center bg-slate-900/45 p-4 backdrop-blur-sm">
+        <div className="fixed inset-0 z-40 flex items-center justify-center bg-slate-900/45 p-4 backdrop-blur-sm">
           <div className="relative z-50 w-full max-w-[30rem] animate-fadeIn rounded-3xl border border-slate-200 bg-white p-8 shadow-[0_24px_60px_-28px_rgba(15,35,65,0.48)]">
             <form onSubmit={handleForm}>
               <h3 className="mb-6 text-center text-2xl font-extrabold text-slate-900">
@@ -163,8 +150,9 @@ function AddCourse() {
                 <button
                   type="submit"
                   className="tm-primary-btn flex-1 py-2.5"
+                  disabled={isSaving}
                 >
-                  確認
+                  {isSaving ? "儲存中..." : "確認"}
                 </button>
                 <button
                   type="button"

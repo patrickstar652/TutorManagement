@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
+import { getApiErrorMessage } from "../api/axiosClient";
 import {
   FaBell,
   FaCalendarAlt,
@@ -10,7 +10,7 @@ import {
   FaArrowRight,
 } from "react-icons/fa";
 
-function AddReminder({ onClose, scheduleId, courseName }) {
+function AddReminder({ onClose, onCreate, scheduleId, courseName }) {
   const [formData, setFormData] = useState({
     title: "",
     content: "",
@@ -53,31 +53,17 @@ function AddReminder({ onClose, scheduleId, courseName }) {
         schedule_id: scheduleId,
       };
 
-      const response = await axios.post(
-        "http://localhost:3000/reminder",
-        payload,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
+      await onCreate(payload);
 
-      if (response.data.success) {
-        setFormData({
-          title: "",
-          content: "",
-          date: "",
-          time: "",
-        });
-
-        if (onClose) onClose();
-      }
+      setFormData({
+        title: "",
+        content: "",
+        date: "",
+        time: "",
+      });
     } catch (err) {
       console.error("建立提醒失敗:", err);
-      const errorMessage =
-        err.response?.data?.message || "建立提醒失敗，請稍後再試";
-      alert(errorMessage);
+      alert(getApiErrorMessage(err, "建立提醒失敗，請稍後再試"));
     } finally {
       setIsSubmitting(false);
     }

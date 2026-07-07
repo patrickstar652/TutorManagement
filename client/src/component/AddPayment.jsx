@@ -1,7 +1,6 @@
 import { useState } from "react";
-import axios from "axios";
 
-function AddPayment({ onClose, onSaved, student, scheduleId }) {
+function AddPayment({ onClose, onSave, student }) {
   const [amount, setAmount] = useState("");
   const [status, setStatus] = useState("未繳");
   const [isSaving, setIsSaving] = useState(false);
@@ -9,25 +8,10 @@ function AddPayment({ onClose, onSaved, student, scheduleId }) {
   const handleSubmit = async () => {
     try {
       setIsSaving(true);
-      const token = localStorage.getItem("token");
 
-      await axios.patch(
-        "http://localhost:3000/payment",
-        {
-          scheduleId,
-          student,
-          amount,
-          status,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (onSaved) onSaved();
-      onClose();
+      if (onSave) {
+        await onSave({ student, amount, status });
+      }
     } catch (error) {
       console.error("更新繳費資料失敗：", error);
       alert("更新繳費資料失敗，請稍後再試");

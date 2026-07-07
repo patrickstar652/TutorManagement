@@ -3,31 +3,18 @@ import { FaBook, FaSun, FaMoon } from "react-icons/fa";
 import { IoLogOutOutline } from "react-icons/io5";
 import { School, CalendarCheck } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import Logout from "../pages/Logout";
-import * as jwt_decode from "jwt-decode";
 import { useState } from "react";
+import { useAuth } from "../context/authContext";
 
 function Navbar() {
   const [isDark, setIsDark] = useState(false);
-  const token = localStorage.getItem("token");
-
-  // 安全地解碼 token
-  let user_info = null;
-  try {
-    if (token && token !== "null" && token !== "undefined") {
-      user_info = jwt_decode.jwtDecode(token);
-    }
-  } catch (error) {
-    console.error("Token 解碼失敗:", error);
-    // 清除無效的 token
-    localStorage.removeItem("token");
-  }
+  const { logout, user } = useAuth();
 
   const navigate = useNavigate();
 
   const handleLogout = (e) => {
     e.preventDefault();
-    Logout();
+    logout();
     navigate("/");
   };
 
@@ -207,7 +194,7 @@ function Navbar() {
           </span>
         </Link>
         <div className="flex flex-1 justify-center gap-1 sm:gap-2">
-          {user_info ? (
+          {user ? (
             <>
               <NavLink className={getLinkColor} to={"/class"}>
                 <div className="flex items-center gap-1.5">
@@ -273,9 +260,9 @@ function Navbar() {
           </button>
 
           {/* 使用者名稱 */}
-          {user_info ? (
+          {user ? (
             <span className="hidden items-center gap-2 rounded-full bg-slate-50 px-3.5 py-2 text-sm font-bold text-[#12345c] ring-1 ring-slate-200 md:flex">
-              {user_info.account}
+              {user.account}
             </span>
           ) : (
             <Link

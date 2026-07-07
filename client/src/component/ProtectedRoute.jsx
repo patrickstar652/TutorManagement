@@ -1,36 +1,9 @@
 import { Navigate, useLocation } from 'react-router-dom';
-import { jwtDecode } from 'jwt-decode';
+import { useAuth } from '../context/authContext';
 
 function ProtectedRoute({ children }) {
   const location = useLocation();
-  
-  const checkAuth = () => {
-    try {
-      const token = localStorage.getItem('token');
-      
-      if (!token) {
-        return false;
-      }
-
-      // 檢查 token 是否有效
-      const decodedToken = jwtDecode(token);
-      const currentTime = Date.now() / 1000;
-
-      // 檢查 token 是否過期
-      if (decodedToken.exp < currentTime) {
-        localStorage.removeItem('token');
-        return false;
-      }
-
-      return true;
-    } catch (error) {
-      console.error('Token 驗證失敗:', error);
-      localStorage.removeItem('token');
-      return false;
-    }
-  };
-
-  const isAuthenticated = checkAuth();
+  const { isAuthenticated } = useAuth();
 
   if (!isAuthenticated) {
     // 儲存使用者原本想要存取的頁面
