@@ -1,6 +1,13 @@
 import { FaEdit } from "react-icons/fa";
 
 function PaymentCard({ payment, onEdit }) {
+  const amount = Number(payment.amount ?? 0);
+  const formattedAmount = new Intl.NumberFormat("zh-TW", {
+    style: "currency",
+    currency: "TWD",
+    maximumFractionDigits: 0,
+  }).format(Number.isFinite(amount) ? amount : 0);
+
   return (
     <div className="tm-card tm-card-hover overflow-hidden">
       <div className="border-b border-slate-200 bg-yellow-50/60 px-5 py-4">
@@ -24,6 +31,12 @@ function PaymentCard({ payment, onEdit }) {
                 minute: "2-digit",
                 hour12: false,
               })}
+            </p>
+            <p className="mt-3 flex items-center gap-2 text-sm font-bold text-slate-700">
+              <span className="text-xs font-extrabold text-slate-400">
+                已繳金額
+              </span>
+              <span className="text-[#12345c]">{formattedAmount}</span>
             </p>
           </div>
 

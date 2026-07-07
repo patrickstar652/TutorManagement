@@ -9,7 +9,7 @@ function Payment() {
   const { scheduleId: scheduleIdParam } = useParams();
   const scheduleId = Number(scheduleIdParam);
   const [showUp, setShowUp] = useState(false);
-  const [student, setStudent] = useState("");
+  const [selectedPayment, setSelectedPayment] = useState(null);
   const { error, loading, payments, savePayment } = usePayments(scheduleId);
 
   const handleSavePayment = async (payment) => {
@@ -38,7 +38,7 @@ function Payment() {
           <PaymentCard
             key={payment.id || payment.class_member_id || index}
             onEdit={(payment) => {
-              setStudent(payment.student_name);
+              setSelectedPayment(payment);
               setShowUp(true);
             }}
             payment={payment}
@@ -47,9 +47,14 @@ function Payment() {
       </div>
       {showUp && (
         <AddPayment
-          onClose={() => setShowUp(false)}
+          initialAmount={selectedPayment?.amount ?? ""}
+          initialStatus={selectedPayment?.status || "未繳"}
+          onClose={() => {
+            setShowUp(false);
+            setSelectedPayment(null);
+          }}
           onSave={handleSavePayment}
-          student={student}
+          student={selectedPayment?.student_name || ""}
         />
       )}
     </>

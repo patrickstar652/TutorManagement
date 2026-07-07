@@ -1,8 +1,14 @@
 import { useState } from "react";
 
-function AddPayment({ onClose, onSave, student }) {
-  const [amount, setAmount] = useState("");
-  const [status, setStatus] = useState("未繳");
+function AddPayment({
+  initialAmount = "",
+  initialStatus = "未繳",
+  onClose,
+  onSave,
+  student,
+}) {
+  const [amount, setAmount] = useState(String(initialAmount ?? ""));
+  const [status, setStatus] = useState(initialStatus || "未繳");
   const [isSaving, setIsSaving] = useState(false);
 
   const handleSubmit = async () => {
