@@ -14,7 +14,7 @@ const success = (res, data = null, options = {}) => {
 const fail = (res, options = {}) => {
   const body = {
     success: false,
-    message: options.message || "伺服器錯誤",
+    message: options.message || "Internal server error",
     code: options.code || "INTERNAL_ERROR",
   };
 

@@ -18,7 +18,7 @@ const errorHandler = (error, req, res, next) => {
 
   return fail(res, {
     statusCode: 500,
-    message: "伺服器錯誤，請稍後再試",
+    message: "Internal server error",
     code: "INTERNAL_ERROR",
   });
 };

@@ -1,7 +1,5 @@
 const jwt = require("jsonwebtoken");
 
-require("dotenv").config();
-
 const config = require("../config");
 const { fail } = require("../utils/response");
 
@@ -12,7 +10,7 @@ const authMiddleware = (req, res, next) => {
   if (!token) {
     return fail(res, {
       statusCode: 401,
-      message: "Token 未提供",
+      message: "Token is required",
       code: "AUTH_TOKEN_MISSING",
     });
   }
@@ -23,7 +21,7 @@ const authMiddleware = (req, res, next) => {
     if (!payload?.id) {
       return fail(res, {
         statusCode: 401,
-        message: "Token 無效：缺少使用者 id",
+        message: "Token is invalid",
         code: "AUTH_TOKEN_INVALID",
       });
     }
@@ -31,10 +29,10 @@ const authMiddleware = (req, res, next) => {
     req.user = { id: payload.id, account: payload.account };
     return next();
   } catch (error) {
-    console.error("JWT 驗證失敗：", error);
+    console.error("JWT verification failed:", error);
     return fail(res, {
       statusCode: 401,
-      message: "Token 無效或已過期",
+      message: "Token is invalid or expired",
       code: "AUTH_TOKEN_INVALID",
     });
   }

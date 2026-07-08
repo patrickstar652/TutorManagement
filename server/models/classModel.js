@@ -24,7 +24,12 @@ const getClassesByUserId = async (userId) => {
   return result.rows;
 };
 
-const findClassByScheduleForUser = async (db, scheduleId, userId, options = {}) => {
+const findClassByScheduleForUser = async (
+  db,
+  scheduleId,
+  userId,
+  options = {}
+) => {
   const lockClause = options.forUpdate ? "FOR UPDATE OF c" : "";
   const result = await db.query(
     `
@@ -136,9 +141,9 @@ const createInitialPayment = async (db, scheduleId, classMemberId, studentName) 
   await db.query(
     `
       INSERT INTO payments (schedule_id, class_member_id, student_name, status, amount)
-      VALUES ($1, $2, $3, '未繳', 0)
+      VALUES ($1, $2, $3, $4, 0)
     `,
-    [scheduleId, classMemberId, studentName]
+    [scheduleId, classMemberId, studentName, "未繳"]
   );
 };
 

@@ -3,7 +3,7 @@ const HttpError = require("../utils/httpError");
 const requireString = (value, fieldName) => {
   const parsed = String(value || "").trim();
   if (!parsed) {
-    throw new HttpError(400, `${fieldName} 為必填`, {
+    throw new HttpError(400, `${fieldName} is required`, {
       field: fieldName,
     });
   }
@@ -18,7 +18,7 @@ const optionalString = (value) => {
 const positiveInt = (value, fieldName) => {
   const parsed = Number(value);
   if (!Number.isInteger(parsed) || parsed <= 0) {
-    throw new HttpError(400, `${fieldName} 無效`, {
+    throw new HttpError(400, `${fieldName} must be a positive integer`, {
       field: fieldName,
     });
   }
@@ -28,7 +28,7 @@ const positiveInt = (value, fieldName) => {
 const nonNegativeInt = (value, fieldName) => {
   const parsed = Number(value);
   if (!Number.isFinite(parsed) || parsed < 0) {
-    throw new HttpError(400, `${fieldName} 格式不正確`, {
+    throw new HttpError(400, `${fieldName} must be a non-negative number`, {
       field: fieldName,
     });
   }
@@ -38,7 +38,7 @@ const nonNegativeInt = (value, fieldName) => {
 const timeString = (value, fieldName) => {
   const parsed = requireString(value, fieldName);
   if (!/^\d{2}:\d{2}$/.test(parsed)) {
-    throw new HttpError(400, `${fieldName} 格式不正確`, {
+    throw new HttpError(400, `${fieldName} must use HH:mm format`, {
       field: fieldName,
     });
   }
@@ -48,7 +48,7 @@ const timeString = (value, fieldName) => {
 const dateString = (value, fieldName) => {
   const parsed = requireString(value, fieldName);
   if (!/^\d{4}-\d{2}-\d{2}$/.test(parsed)) {
-    throw new HttpError(400, `${fieldName} 格式不正確`, {
+    throw new HttpError(400, `${fieldName} must use YYYY-MM-DD format`, {
       field: fieldName,
     });
   }
@@ -58,16 +58,17 @@ const dateString = (value, fieldName) => {
 const paymentStatus = (value) => {
   if (["已繳", "paid", "PAID", "Paid"].includes(value)) return "已繳";
   if (["未繳", "unpaid", "UNPAID", "Unpaid"].includes(value)) return "未繳";
-  throw new HttpError(400, "status 格式不正確", {
+
+  throw new HttpError(400, "status is invalid", {
     field: "status",
-    allowedValues: ["已繳", "未繳"],
+    allowedValues: ["已繳", "未繳", "paid", "unpaid"],
   });
 };
 
 const weekday = (value) => {
   const parsed = positiveInt(value, "weekday");
   if (parsed > 7) {
-    throw new HttpError(400, "weekday 必須介於 1 到 7", {
+    throw new HttpError(400, "weekday must be between 1 and 7", {
       field: "weekday",
     });
   }
@@ -76,7 +77,7 @@ const weekday = (value) => {
 
 const ensureTimeRange = (startTime, endTime) => {
   if (endTime <= startTime) {
-    throw new HttpError(400, "end_time 必須晚於 start_time", {
+    throw new HttpError(400, "end_time must be later than start_time", {
       fields: ["start_time", "end_time"],
     });
   }
@@ -86,7 +87,7 @@ const optionalTime = (value, remindDate) => {
   const parsed = optionalString(value);
   if (!parsed) return null;
   if (!/^\d{2}:\d{2}$/.test(parsed)) {
-    throw new HttpError(400, "remind_at 格式不正確", {
+    throw new HttpError(400, "remind_at must use HH:mm format", {
       field: "remind_at",
     });
   }
@@ -126,7 +127,7 @@ const paymentUpdateRequest = ({ body = {}, params = {} }) => {
   const student = optionalString(body.student);
 
   if (!classMemberId && !student) {
-    throw new HttpError(400, "classMemberId 或 student 至少需要一個", {
+    throw new HttpError(400, "classMemberId or student is required", {
       fields: ["classMemberId", "student"],
     });
   }
