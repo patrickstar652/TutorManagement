@@ -1,6 +1,7 @@
 import AddCourse from "../component/AddCourse";
 import Navbar from "../component/Navbar";
 import ShowCourse from "../component/ShowCourse";
+import { message } from "antd";
 import { useState } from "react";
 import { getApiErrorMessage } from "../api/axiosClient";
 import { useCourses } from "../hooks/useCourses";
@@ -19,13 +20,15 @@ function Course() {
   const handleCreateCourse = async (course) => {
     await addCourse(course);
     setIsAddOpen(false);
+    message.success("課程新增完成");
   };
 
   const handleDeleteCourse = async (courseId) => {
     try {
       await removeCourse(courseId);
+      message.success("課程刪除完成");
     } catch (error) {
-      alert(getApiErrorMessage(error, "刪除課程失敗，請稍後再試"));
+      message.error(getApiErrorMessage(error, "刪除課程失敗，請稍後再試"));
     }
   };
 

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { TimePicker } from "antd";
+import { TimePicker, message } from "antd";
 import "antd/dist/reset.css";
 import { getApiErrorMessage } from "../api/axiosClient";
 
@@ -28,12 +28,13 @@ function AddCourse({ onClose, onCreate, open }) {
 
     // 前端基本驗證
     if (!course_name || !weekday || !start_time || !end_time) {
+      message.warning("請完整填寫課程資料");
       console.warn("請完整填寫欄位");
       return;
     }
     // 時間檢查：下課必須晚於上課
     if (end_time.isSame(start_time) || end_time.isBefore(start_time)) {
-      alert("下課時間必須晚於上課時間");
+      message.warning("下課時間必須晚於上課時間");
       return;
     }
 
@@ -49,7 +50,7 @@ function AddCourse({ onClose, onCreate, open }) {
       resetForm();
     } catch (error) {
       console.error("❌ 新增課程失敗:", error);
-      alert(getApiErrorMessage(error, "新增課程失敗，請稍後再試"));
+      message.error(getApiErrorMessage(error, "新增課程失敗，請稍後再試"));
     } finally {
       setIsSaving(false);
     }

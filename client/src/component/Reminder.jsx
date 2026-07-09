@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { message } from "antd";
 import { useParams } from "react-router-dom";
 import AddReminder from "./AddReminder";
 import ReminderCard from "./ReminderCard";
@@ -72,15 +73,17 @@ function Reminder() {
     try {
       await removeReminder(current.id);
       setIsOpen(false);
+      message.success("提醒刪除完成");
     } catch (e) {
       console.error("刪除失敗", e);
-      alert(getApiErrorMessage(e, "刪除失敗"));
+      message.error(getApiErrorMessage(e, "刪除失敗"));
     }
   };
 
   const handleCreateReminder = async (reminder) => {
     await addReminder(reminder);
     setShowAdd(false);
+    message.success("提醒建立完成");
   };
 
   return (

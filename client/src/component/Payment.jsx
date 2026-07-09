@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { message } from "antd";
 import { useParams } from "react-router-dom";
 import AddPayment from "./AddPayment";
 import PaymentCard from "./PaymentCard";
@@ -16,8 +17,9 @@ function Payment() {
     try {
       await savePayment(payment);
       setShowUp(false);
+      message.success("繳費資料更新完成");
     } catch (error) {
-      alert(getApiErrorMessage(error, "更新繳費資料失敗，請稍後再試"));
+      message.error(getApiErrorMessage(error, "更新繳費資料失敗，請稍後再試"));
     }
   };
 

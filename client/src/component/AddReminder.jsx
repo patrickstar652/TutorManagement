@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { message } from "antd";
 import { getApiErrorMessage } from "../api/axiosClient";
 import {
   FaBell,
@@ -33,12 +34,12 @@ function AddReminder({ onClose, onCreate, scheduleId, courseName }) {
     e.preventDefault();
 
     if (!formData.title || !formData.date) {
-      alert("請填寫標題和日期");
+      message.warning("請填寫標題和日期");
       return;
     }
 
     if (!scheduleId) {
-      alert("錯誤：缺少課程資訊，請從課程頁面重新進入");
+      message.error("錯誤：缺少課程資訊，請從課程頁面重新進入");
       return;
     }
 
@@ -63,7 +64,7 @@ function AddReminder({ onClose, onCreate, scheduleId, courseName }) {
       });
     } catch (err) {
       console.error("建立提醒失敗:", err);
-      alert(getApiErrorMessage(err, "建立提醒失敗，請稍後再試"));
+      message.error(getApiErrorMessage(err, "建立提醒失敗，請稍後再試"));
     } finally {
       setIsSubmitting(false);
     }

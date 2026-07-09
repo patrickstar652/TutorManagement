@@ -3,6 +3,7 @@ import AddSeat from "../component/AddSeat";
 import Reminder from "../component/Reminder";
 import Payment from "../component/Payment";
 import SeatGrid from "../component/SeatGrid";
+import { message } from "antd";
 import { useParams } from "react-router-dom";
 import { useState } from "react";
 import { getApiErrorMessage } from "../api/axiosClient";
@@ -29,8 +30,9 @@ function Seat() {
     try {
       await saveSeat({ seatId: selectedSeatId, name });
       handleCloseModal();
+      message.success("座位儲存完成");
     } catch (error) {
-      alert(getApiErrorMessage(error, "儲存座位失敗，請稍後再試"));
+      message.error(getApiErrorMessage(error, "儲存座位失敗，請稍後再試"));
     }
   };
   return (

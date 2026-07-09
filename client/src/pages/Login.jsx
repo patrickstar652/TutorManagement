@@ -1,5 +1,6 @@
 // 引入 React 與 useState Hook
 import React, { useState } from "react";
+import { message as toastMessage } from "antd";
 import { useNavigate } from "react-router-dom";
 import { getApiErrorMessage } from "../api/axiosClient";
 import { login as loginRequest } from "../api/authApi";
@@ -27,13 +28,16 @@ function Login() {
 
       if (data.token) {
         setMessage("登入成功");
+        toastMessage.success("登入成功");
         login(data.token);
         navigate("/course", { replace: true });
       }
     } catch (error) {
       console.error("登入失敗，錯誤詳情:", error);
 
-      setMessage(getApiErrorMessage(error, "發生未知錯誤"));
+      const errorMessage = getApiErrorMessage(error, "發生未知錯誤");
+      setMessage(errorMessage);
+      toastMessage.error(errorMessage);
     }
   };
 

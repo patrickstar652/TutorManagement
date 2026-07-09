@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { message } from "antd";
 
 function AddSeat({ seatId, onClose, onSave }) { // 接收 onSave props
   const [name, setName] = useState("");
@@ -11,14 +12,19 @@ function AddSeat({ seatId, onClose, onSave }) { // 接收 onSave props
   
   const handleSubmit = async(e) => {
     e.preventDefault();
+    if (!name.trim()) {
+      message.warning("請輸入學生姓名");
+      return;
+    }
+
     setIsSaving(true);
     try {
       if (onSave) {
-        await onSave(name); // 通知父元件重新載入資料
+        await onSave(name.trim()); // 通知父元件重新載入資料
       }
     } catch(error) {
       console.error("儲存失敗:", error);
-      alert("儲存失敗，請稍後再試");
+      message.error("儲存失敗，請稍後再試");
     } finally {
       setIsSaving(false);
     }

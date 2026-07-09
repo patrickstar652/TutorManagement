@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { message } from "antd";
 
 function AddPayment({
   initialAmount = "",
@@ -20,7 +21,7 @@ function AddPayment({
       }
     } catch (error) {
       console.error("更新繳費資料失敗：", error);
-      alert("更新繳費資料失敗，請稍後再試");
+      message.error("更新繳費資料失敗，請稍後再試");
     } finally {
       setIsSaving(false);
     }
