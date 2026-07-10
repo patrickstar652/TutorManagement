@@ -4,6 +4,8 @@ const config = require("../config");
 const { fail } = require("../utils/response");
 
 const authMiddleware = (req, res, next) => {
+
+  // 檢查是否有token
   const authHeader = req.headers.authorization || "";
   const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
 
@@ -15,6 +17,7 @@ const authMiddleware = (req, res, next) => {
     });
   }
 
+  // 驗證token是否有效
   try {
     const payload = jwt.verify(token, config.jwtSecret);
 
@@ -26,8 +29,10 @@ const authMiddleware = (req, res, next) => {
       });
     }
 
+    // 將使用者資料放進 req.user，然後用 next() 交給下一個 middleware 或 controller。
     req.user = { id: payload.id, account: payload.account };
     return next();
+
   } catch (error) {
     console.error("JWT verification failed:", error);
     return fail(res, {

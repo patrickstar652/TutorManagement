@@ -4,6 +4,7 @@ const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:3000",
 });
 
+// 請求攔截器，檢查有沒有jwt，有沒有登入
 apiClient.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
 
@@ -14,6 +15,7 @@ apiClient.interceptors.request.use((config) => {
   return config;
 });
 
+// 回應攔截器，失敗的話代表token過期，清掉localStorage的token，並且觸發auth:expired事件
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -26,6 +28,7 @@ apiClient.interceptors.response.use(
   }
 );
 
+// 最後流程跑完，資料回傳到這裡，真正response的資料
 export const unwrapData = (response) => response.data?.data ?? response.data;
 
 export const getApiErrorMessage = (

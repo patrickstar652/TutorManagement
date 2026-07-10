@@ -53,13 +53,13 @@ function CourseTable({ courseTable, onDelete, timeSlots }) {
                     }`}
                   >
                     {course ? (
-                      <div className="relative mx-auto flex min-h-[52px] min-w-[180px] max-w-[220px] items-center justify-center rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-extrabold text-[#12345c] shadow-sm transition-all duration-200 group-hover:-translate-y-0.5 group-hover:border-red-100 group-hover:shadow-[0_16px_28px_-24px_rgba(220,38,38,0.65)]">
-                          <span className="truncate">
+                      <div className="course-chip relative mx-auto flex min-h-11 min-w-[150px] max-w-[180px] items-center justify-center rounded-xl border border-slate-200 bg-white px-10 py-2 text-sm font-extrabold text-[#12345c] shadow-sm transition-all duration-200 group-hover:-translate-y-0.5 group-hover:border-red-100 group-hover:shadow-[0_16px_28px_-24px_rgba(220,38,38,0.65)]">
+                          <span className="w-full truncate text-center">
                             {course.courseName}
                           </span>
                         <button
                           aria-label={`刪除 ${course.courseName}`}
-                          className="absolute right-0 top-1/2 z-10 flex h-9 w-9 translate-x-[calc(100%+0.5rem)] -translate-y-1/2 items-center justify-center rounded-xl border border-red-100 bg-red-50 text-red-600 opacity-0 shadow-sm transition-all duration-200 hover:bg-red-600 hover:text-white hover:shadow-lg hover:shadow-red-500/30 focus:translate-x-[calc(100%+0.25rem)] focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-red-200 active:scale-95 group-hover:translate-x-[calc(100%+0.25rem)] group-hover:opacity-100"
+                          className="course-delete absolute right-2 top-1/2 z-10 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-md border border-red-100 bg-red-50 text-red-600 opacity-0 shadow-sm transition-all duration-200 hover:bg-red-600 hover:text-white hover:shadow-lg hover:shadow-red-500/30 focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-red-200 active:scale-95 group-hover:opacity-100"
                           onClick={(event) => {
                             event.stopPropagation();
                             onDelete(course.courseId);

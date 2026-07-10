@@ -7,6 +7,7 @@ const {
   scheduleIdParam,
 } = require("../validators/requestValidators");
 
+// 接收請求 → 驗證資料 → 取得登入者身分 → 呼叫 Model 操作資料庫 → 統一回傳 API 結果
 const updatePayment = async (req, res) => {
   const { amount, classMemberId, scheduleId, status, student } =
     paymentUpdateRequest({

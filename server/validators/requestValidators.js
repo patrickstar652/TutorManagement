@@ -1,5 +1,6 @@
 const HttpError = require("../utils/httpError");
 
+// 負責在 Controller 呼叫 Model 之前，先驗證、轉型和整理前端傳來的資料
 const requireString = (value, fieldName) => {
   const parsed = String(value || "").trim();
   if (!parsed) {

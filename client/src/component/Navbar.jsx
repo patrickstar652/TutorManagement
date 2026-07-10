@@ -3,11 +3,13 @@ import { FaBook, FaSun, FaMoon } from "react-icons/fa";
 import { IoLogOutOutline } from "react-icons/io5";
 import { School, CalendarCheck } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "../context/authContext";
 
 function Navbar() {
-  const [isDark, setIsDark] = useState(false);
+  const [isDark, setIsDark] = useState(() => {
+    return window.localStorage.getItem("theme") === "dark";
+  });
   const { logout, user } = useAuth();
 
   const navigate = useNavigate();
@@ -21,6 +23,12 @@ function Navbar() {
   const toggleDarkMode = () => {
     setIsDark((prev) => !prev);
   };
+
+  useEffect(() => {
+    document.documentElement.classList.toggle("theme-dark", isDark);
+    document.body.classList.toggle("theme-dark", isDark);
+    window.localStorage.setItem("theme", isDark ? "dark" : "light");
+  }, [isDark]);
 
   // 根據當前路由決定導航連結的顏色
   const getLinkColor = ({ isActive }) => {
@@ -234,6 +242,9 @@ function Navbar() {
           {/* 深淺色模式切換按鈕 */}
           <button
             onClick={toggleDarkMode}
+            type="button"
+            aria-label={isDark ? "切換為淺色模式" : "切換為深色模式"}
+            aria-pressed={isDark}
             className={`relative flex h-7 w-14 items-center justify-between rounded-full px-1 duration-700 ease-in-out ${
               isDark ? "bg-gray-700" : "bg-slate-100"
             } hover:shadow-md`}

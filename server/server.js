@@ -35,13 +35,15 @@ app.use(cors(corsOptions));
 // middleware 的主要用途就是處理在 request 到達你的路由之前，或者在 response 返回給用戶之前所需要做的各種操作
 app.use(express.json());
 
-// 同種類型的處理放一個檔案
+// 符合後進入路由，路由會依照請求的 URL 路徑來決定要執行哪個 controller 的 function
 const courseRoutes = require('./routes/course');
 const successRoutes = require('./routes/user');
 const classRoutes = require('./routes/class');
 const reminderRoutes = require('./routes/reminder');
 const paymentRoutes = require('./routes/payment');
-app.use('/', successRoutes); // 所有 /welcome 路由就掛上來了
+
+// 先依序查詢
+app.use('/', successRoutes);
 app.use('/', courseRoutes);
 app.use('/', classRoutes);
 app.use('/', reminderRoutes);
@@ -52,17 +54,3 @@ app.use(errorHandler);
 app.listen(config.port, () => {
   console.log(`✅ Server running at http://localhost:${config.port}`);
 });
-
-//403 跨域禁止
-//400 請求格式錯誤 (少資料)
-//500 伺服器內部錯誤
-//401 未授權(帳密錯)
-
-//使用者 → 前端（React） → [axios 發送 JSON] → 後端（Express）
-// 後端處理 → 回傳 JSON 結果 → 前端顯示或跳轉頁面
-
-// 前後端幾乎都用 JSON 溝通，因為它：
-// 結構清晰
-// JavaScript 原生支援
-// 適合 API 設計
-// 通用性高，後端語言不管是 Node、Python、Java 都能讀寫
