@@ -71,18 +71,11 @@ const updateSeatForClass = async ({ scheduleId, seatId, name, userId }) => {
     }
 
     const student = await classModel.upsertStudent(client, userId, name);
-    const classMemberId = await assignSeatToStudent({
+    await assignSeatToStudent({
       client,
       classId: classRow.id,
       seatId,
       studentId: student.id,
-    });
-
-    await ensurePaymentForClassMember({
-      client,
-      scheduleId,
-      classMemberId,
-      studentName: student.name,
     });
 
     return {
@@ -119,34 +112,6 @@ const assignSeatToStudent = async ({ client, classId, seatId, studentId }) => {
   );
 
   return member.id;
-};
-
-const ensurePaymentForClassMember = async ({
-  client,
-  scheduleId,
-  classMemberId,
-  studentName,
-}) => {
-  const payment = await classModel.findPaymentByClassMemberId(
-    client,
-    classMemberId
-  );
-
-  if (!payment) {
-    await classModel.createInitialPayment(
-      client,
-      scheduleId,
-      classMemberId,
-      studentName
-    );
-    return;
-  }
-
-  await classModel.updatePaymentStudentName(
-    client,
-    classMemberId,
-    studentName
-  );
 };
 
 module.exports = {

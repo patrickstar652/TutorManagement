@@ -3,3 +3,4 @@ node_modules
 .idea/
 vite-*.err.log
 vite-*.out.log
+supabase/.temp/

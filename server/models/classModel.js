@@ -128,48 +128,14 @@ const createClassMember = async (db, classId, studentId, seatId) => {
   return result.rows[0];
 };
 
-const findPaymentByClassMemberId = async (db, classMemberId) => {
-  const result = await db.query(
-    "SELECT id FROM payments WHERE class_member_id = $1",
-    [classMemberId]
-  );
-
-  return result.rows[0] || null;
-};
-
-const createInitialPayment = async (db, scheduleId, classMemberId, studentName) => {
-  await db.query(
-    `
-      INSERT INTO payments (schedule_id, class_member_id, student_name, status, amount)
-      VALUES ($1, $2, $3, $4, 0)
-    `,
-    [scheduleId, classMemberId, studentName, "未繳"]
-  );
-};
-
-const updatePaymentStudentName = async (db, classMemberId, studentName) => {
-  await db.query(
-    `
-      UPDATE payments
-      SET student_name = $1,
-          updated_at = CURRENT_TIMESTAMP
-      WHERE class_member_id = $2
-    `,
-    [studentName, classMemberId]
-  );
-};
-
 module.exports = {
   createClassMember,
-  createInitialPayment,
   deleteClassMemberBySeat,
   deleteConflictingClassMembers,
   findClassByScheduleForUser,
   findClassMemberBySeat,
-  findPaymentByClassMemberId,
   getClassesByUserId,
   getSeatMembersByClassId,
   touchClassMember,
-  updatePaymentStudentName,
   upsertStudent,
 };

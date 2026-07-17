@@ -18,7 +18,7 @@ const optionalString = (value) => {
 
 const positiveInt = (value, fieldName) => {
   const parsed = Number(value);
-  if (!Number.isInteger(parsed) || parsed <= 0) {
+  if (!Number.isSafeInteger(parsed) || parsed <= 0) {
     throw new HttpError(400, `${fieldName} must be a positive integer`, {
       field: fieldName,
     });
@@ -28,12 +28,22 @@ const positiveInt = (value, fieldName) => {
 
 const nonNegativeInt = (value, fieldName) => {
   const parsed = Number(value);
-  if (!Number.isFinite(parsed) || parsed < 0) {
-    throw new HttpError(400, `${fieldName} must be a non-negative number`, {
+  if (!Number.isSafeInteger(parsed) || parsed < 0) {
+    throw new HttpError(400, `${fieldName} must be a non-negative integer`, {
       field: fieldName,
     });
   }
-  return Math.trunc(parsed);
+  return parsed;
+};
+
+const positivePostgresInt = (value, fieldName) => {
+  const parsed = positiveInt(value, fieldName);
+  if (parsed > 2147483647) {
+    throw new HttpError(400, `${fieldName} is too large`, {
+      field: fieldName,
+    });
+  }
+  return parsed;
 };
 
 const timeString = (value, fieldName) => {
@@ -53,6 +63,17 @@ const dateString = (value, fieldName) => {
       field: fieldName,
     });
   }
+
+  const parsedDate = new Date(`${parsed}T00:00:00.000Z`);
+  if (
+    Number.isNaN(parsedDate.getTime()) ||
+    parsedDate.toISOString().slice(0, 10) !== parsed
+  ) {
+    throw new HttpError(400, `${fieldName} must be a valid calendar date`, {
+      field: fieldName,
+    });
+  }
+
   return parsed;
 };
 
@@ -117,30 +138,56 @@ const scheduleIdParam = (params = {}) => ({
   scheduleId: positiveInt(params.scheduleId, "scheduleId"),
 });
 
-const paymentUpdateRequest = ({ body = {}, params = {} }) => {
-  const scheduleId = positiveInt(
-    params.scheduleId || body.scheduleId,
-    "scheduleId"
-  );
-  const classMemberId = body.classMemberId
-    ? positiveInt(body.classMemberId, "classMemberId")
-    : null;
-  const student = optionalString(body.student);
+const billingPeriodPayload = (body = {}) => {
+  const periodStart = dateString(body.periodStart, "periodStart");
+  const periodEnd = dateString(body.periodEnd, "periodEnd");
 
-  if (!classMemberId && !student) {
-    throw new HttpError(400, "classMemberId or student is required", {
-      fields: ["classMemberId", "student"],
+  if (periodEnd < periodStart) {
+    throw new HttpError(400, "periodEnd must be on or after periodStart", {
+      fields: ["periodStart", "periodEnd"],
+    });
+  }
+
+  const lessonCount = positivePostgresInt(body.lessonCount, "lessonCount");
+  const unitPrice = nonNegativeInt(body.unitPrice, "unitPrice");
+  const amountPerStudent = lessonCount * unitPrice;
+
+  if (!Number.isSafeInteger(amountPerStudent)) {
+    throw new HttpError(400, "calculated amount is too large", {
+      fields: ["lessonCount", "unitPrice"],
     });
   }
 
   return {
-    amount: nonNegativeInt(body.amount, "amount"),
-    classMemberId,
-    scheduleId,
-    status: paymentStatus(body.status),
-    student,
+    amountPerStudent,
+    lessonCount,
+    periodEnd,
+    periodStart,
+    unitPrice,
   };
 };
+
+const billingPeriodCreateRequest = ({ body = {}, params = {} }) => ({
+  ...billingPeriodPayload(body),
+  scheduleId: positiveInt(params.scheduleId, "scheduleId"),
+});
+
+const billingPeriodUpdateRequest = ({ body = {}, params = {} }) => ({
+  ...billingPeriodPayload(body),
+  periodId: positiveInt(params.periodId, "periodId"),
+  scheduleId: positiveInt(params.scheduleId, "scheduleId"),
+});
+
+const paymentListRequest = ({ params = {}, query = {} }) => ({
+  periodId: query.periodId ? positiveInt(query.periodId, "periodId") : null,
+  scheduleId: positiveInt(params.scheduleId, "scheduleId"),
+});
+
+const paymentStatusUpdateRequest = ({ body = {}, params = {} }) => ({
+  paymentId: positiveInt(params.paymentId, "paymentId"),
+  scheduleId: positiveInt(params.scheduleId, "scheduleId"),
+  status: paymentStatus(body.status),
+});
 
 const reminderCreateRequest = (body = {}) => {
   const remindDate = dateString(body.remind_date, "remind_date");
@@ -172,9 +219,12 @@ const seatUpdateRequest = ({ body = {}, params = {} }) => ({
 });
 
 module.exports = {
+  billingPeriodCreateRequest,
+  billingPeriodUpdateRequest,
   courseRequest,
   loginRequest,
-  paymentUpdateRequest,
+  paymentListRequest,
+  paymentStatusUpdateRequest,
   reminderCreateRequest,
   reminderIdParam,
   reminderListRequest,

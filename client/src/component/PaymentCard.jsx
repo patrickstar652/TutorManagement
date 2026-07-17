@@ -1,67 +1,73 @@
-import { FaEdit } from "react-icons/fa";
+import { FaCheck, FaUndo } from "react-icons/fa";
 
-function PaymentCard({ payment, onEdit }) {
-  const amount = Number(payment.amount ?? 0);
-  const formattedAmount = new Intl.NumberFormat("zh-TW", {
-    style: "currency",
-    currency: "TWD",
-    maximumFractionDigits: 0,
-  }).format(Number.isFinite(amount) ? amount : 0);
+const currencyFormatter = new Intl.NumberFormat("zh-TW", {
+  currency: "TWD",
+  maximumFractionDigits: 0,
+  style: "currency",
+});
+
+const formatPaidAt = (value) => {
+  if (!value) return "尚未繳費";
+
+  return new Date(value).toLocaleString("zh-TW", {
+    day: "2-digit",
+    hour: "2-digit",
+    hour12: false,
+    minute: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
+};
+
+function PaymentCard({ disabled = false, payment, onToggle, updating }) {
+  const isPaid = payment.status === "已繳";
 
   return (
-    <div className="tm-card tm-card-hover overflow-hidden">
-      <div className="border-b border-slate-200 bg-yellow-50/60 px-5 py-4">
-        <h2 className="flex items-center gap-2 text-base font-extrabold text-slate-900">
-          繳費狀態
-        </h2>
-      </div>
-
-      <div className="p-5">
-        <div className="flex items-center justify-between gap-4 rounded-2xl bg-white p-4 ring-1 ring-slate-200 transition-colors hover:bg-slate-50">
-          <div className="min-w-0">
-            <p className="truncate text-lg font-extrabold text-slate-900">
-              {payment.student_name}
-            </p>
-            <p className="mt-1 text-xs font-medium text-slate-500">
-              {new Date(payment.created_at).toLocaleString("zh-TW", {
-                year: "numeric",
-                month: "2-digit",
-                day: "2-digit",
-                hour: "2-digit",
-                minute: "2-digit",
-                hour12: false,
-              })}
-            </p>
-            <p className="mt-3 flex items-center gap-2 text-sm font-bold text-slate-700">
-              <span className="text-xs font-extrabold text-slate-400">
-                已繳金額
-              </span>
-              <span className="text-[#12345c]">{formattedAmount}</span>
-            </p>
-          </div>
-
-          <div className="flex shrink-0 items-center gap-2">
-            <span
-              className={`rounded-full px-3 py-1.5 text-xs font-extrabold ring-1 ${
-                payment.status === "已繳"
-                  ? "bg-emerald-50 text-emerald-700 ring-emerald-100"
-                  : "bg-yellow-50 text-yellow-700 ring-yellow-100"
-              }`}
-            >
-              {payment.status}
-            </span>
-            <button
-              className="rounded-full p-2 text-slate-400 transition-colors hover:bg-slate-100 hover:text-[#12345c]"
-              title="更新繳費資料"
-              onClick={() => onEdit(payment)}
-              type="button"
-            >
-              <FaEdit size={18} />
-            </button>
-          </div>
+    <article className="tm-card tm-card-hover flex flex-col justify-between p-5">
+      <div className="flex items-start justify-between gap-4">
+        <div className="min-w-0">
+          <p className="truncate text-lg font-extrabold text-slate-900">
+            {payment.student_name}
+          </p>
+          <p className="mt-1 text-xs font-semibold text-slate-500">
+            {isPaid ? `繳費時間：${formatPaidAt(payment.paid_at)}` : "等待繳費"}
+          </p>
         </div>
+        <span
+          className={
+            isPaid
+              ? "tm-badge-success shrink-0"
+              : "tm-badge-warning shrink-0"
+          }
+        >
+          {payment.status}
+        </span>
       </div>
-    </div>
+
+      <div className="mt-6 flex items-end justify-between gap-4 border-t border-slate-100 pt-4">
+        <div>
+          <p className="text-xs font-bold uppercase tracking-wider text-slate-400">
+            本期應繳
+          </p>
+          <p className="mt-1 text-xl font-extrabold text-slate-900">
+            {currencyFormatter.format(Number(payment.amount_due) || 0)}
+          </p>
+        </div>
+        <button
+          className={
+            isPaid
+              ? "tm-secondary-btn px-4 py-2 text-sm"
+              : "tm-primary-btn px-4 py-2 text-sm"
+          }
+          disabled={disabled || updating}
+          onClick={() => onToggle(payment)}
+          type="button"
+        >
+          {isPaid ? <FaUndo /> : <FaCheck />}
+          {updating ? "更新中..." : isPaid ? "改回未繳" : "標記已繳"}
+        </button>
+      </div>
+    </article>
   );
 }
 
